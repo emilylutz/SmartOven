@@ -21,6 +21,7 @@ var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
 var editedLabel = ""
 /* Changes the value of "Set Temp:" when you type */
 max = 10;
+fieldHint1 = "";
 function newTempVal(value) {
 	if (value == "del") {
 		str = editedLabel.string
@@ -32,16 +33,20 @@ function newTempVal(value) {
 	else if (editedLabel.string.length < max) {
 	 editedLabel.string+= value
 	 }
+	else if (editedLabel.string.length == 0) {
+	 editedLabel.string = fieldHint1;
+	}
 	}
 	
 var canAdd = 1;
 exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
-		top:$.top,left:$.left, right:$.right, width:$.width, label:$.label,max:$.max, height: $.height,skin:$.skin,keyboard:$.keyboard,
+		top:$.top,left:$.left, right:$.right, width:$.width, label:$.label,max:$.max, height: $.height,skin:$.skin,keyboard:$.keyboard,fieldHint:$.fieldHint,
 	contents:$.contents,
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
-			editedLabel = $.label
-			max = $.max
+			editedLabel = $.label;
+			max = $.max;
+			fieldHint1 = $.fieldHint;
 			if (canAdd) {				
 				application.add(numKeyboard);
 				}
