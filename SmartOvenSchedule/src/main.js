@@ -7,6 +7,7 @@ var NUMKEYBOARD = require("numKeyboard.js");
 /*STYLES*/
 var labelStyle = new Style({ font:"24px Heiti SC", color:"black", horizontal:"center", vertical:"middle" });
 var menuStyle = new Style({ font:"21px Heiti SC", color:"black", horizontal:"center", vertical:"top" });
+var titleStyle = new Style({ font:"28px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
 
 /*TEXTURES*/
 var menuTexture = new Texture("./assets/menu.png");
@@ -55,14 +56,14 @@ var nameField = Container.template(function($) { return {
 }});
 
 var actionField = Container.template(function($) { return { 
-  left:10, width: 160, height: 36, skin: nameInputSkin, active:true, contents: [
+  left:10, top:0, width: 160, skin: nameInputSkin, active:true, contents: [
         Label($, { 
-          left: 8, top: 0, bottom: 0, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
+          left: 8, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
           string: $.name, active:true, name: "lbl",
          	behavior: Object.create(Behavior.prototype, {
          		onTouchEnded: { value: function(container, id, x,  y, ticks) {
 	        	    if (info.menu == false) {
-	        	    	action.add(dropDownMenu);
+	        	    	actionContainer.add(dropDownMenu);
 	        	    	info.menu = true;
 	        	    }
 	        	}}
@@ -72,15 +73,16 @@ var actionField = Container.template(function($) { return {
 }});
 
 var DropDownMenu = Container.template(function($) { return {
-	left: 10, top: -2, width: 160, skin: dropDownSkin, active: true,
+	left: 10, width: 160, top:0, skin: dropDownSkin, active: true,
 	contents: [
 	           Column($, {left: 0, right: 0, top: 0, bottom: 0, 
 	        	   contents: [
 			           Label($, {height: 40, top: 15, style:menuStyle, active: true, string:'Bake',
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {
-				        	    	   action.remove(dropDownMenu);
+				        	    	   actionContainer.remove(dropDownMenu);
 				        	    	   aField.lbl.string = "Bake";
+				        	    	   info.action = "Bake";
 			        				   info.menu = false;
 			        	    	}}
 			        	    })     	    	
@@ -88,8 +90,9 @@ var DropDownMenu = Container.template(function($) { return {
 			           Label($, {height: 40, style:menuStyle, active: true, string:'Broil', 
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {		        			   	   
-			        			   	   action.remove(dropDownMenu);
+			        			   	   actionContainer.remove(dropDownMenu);
 			        			   	   aField.lbl.string = "Broil";
+			        			   	   info.action = "Broil";
 			        			   	   info.menu = false;
 			        	    	}}
 			        	    })   
@@ -104,26 +107,23 @@ var temperatureField = Container.template(function($) { return {
   left:10, width: 160, height: 36, skin: nameInputSkin, active:true, contents: [
         Label($, { 
           left: 8, top: 0, bottom: 0, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
-          string: $.name, active:true, name: "tLabel",  
-         }),
-         Label($, {
-   			 	left:4, right:4, top:4, bottom:4, style:fieldHintStyle, string:"Temperature", name:"hint"
-         }),
+          string: "Temperature", active:true, name: "tLabel",  
+         })
   ]
 }});
 
-var name = new Line({left:10, right:0, top:0, bottom:0, contents:[new nameField({ name: "" })]});
-var dropDownMenu = new Line({left:0, right:0, top:0, bottom:0, contents:[new DropDownMenu()]});
-var aField = new actionField({ name: "Action" })
-var action = new Column({left:0, right:0, top:-30, bottom:0, height: 60, contents:[aField]});
-var temperature1 = new temperatureField({ name: "" });
+var nameContainer = new Line({left: 10, top:20, contents:[new nameField({ name: "" })]});
+var aField = new actionField({ name: "Action" });
+var dropDownMenu = new Container({left:0, right:0, top:30, bottom:0, contents:[new DropDownMenu()]});
+var actionContainer = new Container({left:0, top:10, height: 140, contents:[aField]});
+var tField = new temperatureField();
 
 /******** This is a button that will open up the keyboard 
 /* inputs:
 /* label = the label you want to edit
 /* max = the maximum size you want the string to be */
-var temperature = new NUMKEYBOARD.openKeyboardTemplate({top:0,bottom:0,left:0,right:0, label:temperature1.tLabel, max:12, fieldHint: "Temperature",
-	contents:[temperature1]});
+var temperatureContainer = new NUMKEYBOARD.openKeyboardTemplate({top:0,bottom:0,left:0,right:0, label:tField.tLabel, max:12, fieldHint: "Temperature",
+	contents:[tField]});
 
 var MainContainerTemplate = Container.template(function($) { return {
   left: 0, right: 0, top: 0, bottom: 0, skin: whiteSkin, active: true,
@@ -137,12 +137,14 @@ var MainContainerTemplate = Container.template(function($) { return {
   	new Column({
 		left:0, right:0, top:0, bottom:0,
 		contents: [
-			new Label({
-   			 	left:0, right:0, top:0, bottom:0, style: labelStyle, string:"Recipe name"
-         	}),
-			name,
-			action,
-			temperature
+			new Container({height: 60, left:0, right:0, skin:greenS, top:0,
+				contents: [
+					new Label({left:15, string: "Set schedule:", style: titleStyle})
+				]
+			}),
+			nameContainer,
+			actionContainer,
+			temperatureContainer
 		]
 	})
   ]

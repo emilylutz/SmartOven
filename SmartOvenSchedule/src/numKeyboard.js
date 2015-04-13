@@ -33,9 +33,6 @@ function newTempVal(value) {
 	else if (editedLabel.string.length < max) {
 	 editedLabel.string+= value
 	 }
-	else if (editedLabel.string.length == 0) {
-	 editedLabel.string = fieldHint1;
-	}
 	}
 	
 var canAdd = 1;
@@ -45,6 +42,9 @@ exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
 			editedLabel = $.label;
+			if (isNaN(editedLabel.string)) {
+				editedLabel.string = "";
+			}
 			max = $.max;
 			fieldHint1 = $.fieldHint;
 			if (canAdd) {				
@@ -99,6 +99,9 @@ var enterKeyTemplate = BUTTONS.Button.template(function($){ return{
 			button.skin = greenS;
 			application.remove(numKeyboard);
 			canAdd = 1;
+			if (editedLabel.string.length == 0) {
+				editedLabel.string = fieldHint1;
+			}
 		}},
 		onTouchBegan: { value:  function(button){
 			button.skin = greyS
