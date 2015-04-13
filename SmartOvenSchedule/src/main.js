@@ -3,8 +3,8 @@ var CONTROL = require('mobile/control');
 var KEYBOARD = require('mobile/keyboard');
 
 /*STYLES*/
-var labelStyle = new Style({ font:"bold 34px", color:"black", horizontal:"center", vertical:"middle" });
-var menuStyle = new Style({ font:"bold 26px", color:"black", horizontal:"center", vertical:"top" });
+var labelStyle = new Style({ font:"24px Heiti SC", color:"black", horizontal:"center", vertical:"middle" });
+var menuStyle = new Style({ font:"21px Heiti SC", color:"black", horizontal:"center", vertical:"top" });
 
 /*TEXTURES*/
 var menuTexture = new Texture("./assets/menu.png");
@@ -12,11 +12,10 @@ var menuTexture = new Texture("./assets/menu.png");
 /*SKINS*/
 var menuBackgroundSkin = new Skin({ fill: "#00FFFF" } );
 var menuButtonSkin = new Skin({fill: "#CCCCCC" });
-var threeLineSkin = new Skin({texture: menuTexture, x:0, y:0, width:35, height:35});
-var dropDownSkin = new Skin({fill: '#FE9999FF'});
-var nameInputSkin = new Skin({ borders: { left:2, right:2, top:2, bottom:2 }, stroke: 'gray',});
-var fieldStyle = new Style({ color: 'black', font: 'bold 24px', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
-var fieldHintStyle = new Style({ color: '#aaa', font: '24px', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
+var dropDownSkin = new Skin({borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray'});
+var nameInputSkin = new Skin({ borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray',});
+var fieldStyle = new Style({ color: 'black', font: '21px Heiti SC', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
+var fieldHintStyle = new Style({ color: '#aaa', font: "24px Heiti SC", horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
 var whiteSkin = new Skin({fill:"white"});
 
 var info = new Object();
@@ -51,15 +50,14 @@ var nameField = Container.template(function($) { return {
 }});
 
 var temperatureField = Container.template(function($) { return { 
-  width: 250, height: 36, skin: nameInputSkin, active:true, contents: [
+  left:10, width: 160, height: 36, skin: nameInputSkin, active:true, contents: [
         Label($, { 
           left: 0, top: 0, bottom: 0, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
-          string: $.name, active:true,
+          string: $.name, active:true, name: "lbl",
          	behavior: Object.create(Behavior.prototype, {
          		onTouchEnded: { value: function(container, id, x,  y, ticks) {
-         			trace("asdf");
 	        	    if (info.menu == false) {
-	        	    	tempField.add(DropDownMenu);
+	        	    	temperature.add(dropDownMenu);
 	        	    	info.menu = true;
 	        	    }
 	        	}}
@@ -69,14 +67,15 @@ var temperatureField = Container.template(function($) { return {
 }});
 
 var DropDownMenu = Container.template(function($) { return {
-	right: 35, top: 15, width: 160, skin: dropDownSkin, active: true,
+	left: 10, top: -2, width: 160, skin: dropDownSkin, active: true,
 	contents: [
 	           Column($, {left: 0, right: 0, top: 0, bottom: 0, 
 	        	   contents: [
-			           Label($, {height: 40, style:menuStyle, active: true, string:'Bake',
+			           Label($, {height: 40, top: 15, style:menuStyle, active: true, string:'Bake',
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {
-				        	    	   tempField.remove(dropDownMenu);
+				        	    	   temperature.remove(dropDownMenu);
+				        	    	   tField.lbl.string = "Bake";
 			        				   info.menu = false;
 			        	    	}}
 			        	    })     	    	
@@ -84,7 +83,8 @@ var DropDownMenu = Container.template(function($) { return {
 			           Label($, {height: 40, style:menuStyle, active: true, string:'Preheat', 
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {
-			        			   	   tempField.remove(dropDownMenu);
+			        			   	   temperature.remove(dropDownMenu);
+			        			   	   tField.lbl.string = "Preheat";
 			        			   	   info.menu = false;
 			        	    	}}
 			        	    })   
@@ -92,7 +92,8 @@ var DropDownMenu = Container.template(function($) { return {
 			           Label($, {height: 40, style:menuStyle, active: true, string:'Broil', 
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {		        			   	   
-			        			   	   tempField.remove(dropDownMenu);
+			        			   	   temperature.remove(dropDownMenu);
+			        			   	   tField.lbl.string = "Broil";
 			        			   	   info.menu = false;
 			        	    	}}
 			        	    })   
@@ -103,9 +104,10 @@ var DropDownMenu = Container.template(function($) { return {
 
 }})
 
-var dropDownMenu = new DropDownMenu();
-var field = new Line({left:0, right:0, top:0, bottom:0, skin: whiteSkin, contents:[new nameField({ name: "" })]});
-var tempField = new Line({left:0, right:0, top:0, bottom:0, skin: whiteSkin, contents:[new temperatureField({ name: "Temperature" })]});
+var dropDownMenu = new Line({left:0, right:0, top:0, bottom:0, contents:[new DropDownMenu()]});
+var name = new Line({left:10, right:0, top:0, bottom:0, contents:[new nameField({ name: "" })]});
+var tField = new temperatureField({ name: "Temperature" })
+var temperature = new Column({left:0, right:0, top:-30, bottom:0, height: 60, contents:[tField]});
 
 var MainContainerTemplate = Container.template(function($) { return {
   left: 0, right: 0, top: 0, bottom: 0, skin: whiteSkin, active: true,
@@ -119,8 +121,8 @@ var MainContainerTemplate = Container.template(function($) { return {
   	new Column({
 		left:0, right:0, top:0, bottom:0,
 		contents: [
-			field,
-			tempField
+			name,
+			temperature
 		]
 	})
   ]
