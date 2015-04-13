@@ -1,6 +1,8 @@
 var THEME = require('themes/sample/theme');
 var CONTROL = require('mobile/control');
 var KEYBOARD = require('mobile/keyboard');
+var BUTTONS = require('controls/buttons');
+var KEYBOARD1 = require("numKeyboard.js");
 
 /*STYLES*/
 var labelStyle = new Style({ font:"24px Heiti SC", color:"black", horizontal:"center", vertical:"middle" });
@@ -13,10 +15,12 @@ var menuTexture = new Texture("./assets/menu.png");
 var menuBackgroundSkin = new Skin({ fill: "#00FFFF" } );
 var menuButtonSkin = new Skin({fill: "#CCCCCC" });
 var dropDownSkin = new Skin({borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray'});
-var nameInputSkin = new Skin({ borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray',});
+var nameInputSkin = new Skin({ borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray', left: 5, right: 5, top: 5, bottom: 5});
 var fieldStyle = new Style({ color: 'black', font: '21px Heiti SC', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
-var fieldHintStyle = new Style({ color: '#aaa', font: "24px Heiti SC", horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
+var fieldHintStyle = new Style({ color: '#aaa', font: "21px Heiti SC", horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
 var whiteSkin = new Skin({fill:"white"});
+var greenS = new Skin({fill:"#67BFA0"});
+var tempStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
 
 var info = new Object();
 info.action = 'Bake';
@@ -24,7 +28,8 @@ info.temperature = 0;
 info.hour = 0;
 info.minutes = 0;
 info.menu = false;
-              
+
+/******** This is the label that will be affected by what you type on the keyboard ******/        
 var nameField = Container.template(function($) { return { 
   width: 250, height: 36, skin: nameInputSkin, contents: [
     Scroller($, { 
@@ -52,7 +57,7 @@ var nameField = Container.template(function($) { return {
 var temperatureField = Container.template(function($) { return { 
   left:10, width: 160, height: 36, skin: nameInputSkin, active:true, contents: [
         Label($, { 
-          left: 0, top: 0, bottom: 0, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
+          left: 8, top: 0, bottom: 0, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
           string: $.name, active:true, name: "lbl",
          	behavior: Object.create(Behavior.prototype, {
          		onTouchEnded: { value: function(container, id, x,  y, ticks) {
@@ -109,6 +114,16 @@ var name = new Line({left:10, right:0, top:0, bottom:0, contents:[new nameField(
 var tField = new temperatureField({ name: "Temperature" })
 var temperature = new Column({left:0, right:0, top:-30, bottom:0, height: 60, contents:[tField]});
 
+/******** This is the label that will be affected by what you type on the keyboard ******/
+var statusLabel = new Label({left: 0, right: 0, height: 70, top: 20,string: "", style: tempStyle})
+
+/******** This is a button that will open up the keyboard 
+/* inputs:
+/* label = the label you want to edit
+/* max = the maximum size you want the string to be */
+var showKeyboard = new KEYBOARD1.openKeyboardTemplate({skin:greenS, top:100,bottom:0,left:0,right:0,height:100, label:statusLabel,max:5,
+	contents:[new Label({string:"click me", style:tempStyle})] });
+
 var MainContainerTemplate = Container.template(function($) { return {
   left: 0, right: 0, top: 0, bottom: 0, skin: whiteSkin, active: true,
   behavior: Object.create(Container.prototype, {
@@ -122,7 +137,8 @@ var MainContainerTemplate = Container.template(function($) { return {
 		left:0, right:0, top:0, bottom:0,
 		contents: [
 			name,
-			temperature
+			temperature,
+			statusLabel
 		]
 	})
   ]
@@ -131,3 +147,4 @@ var MainContainerTemplate = Container.template(function($) { return {
 var mainContainer = new MainContainerTemplate();
 
 application.add(mainContainer);
+application.add(showKeyboard);
