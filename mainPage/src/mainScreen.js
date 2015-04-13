@@ -23,12 +23,12 @@ var borderedV = new Skin({borders:{left:1,right:1,top:0,bottom:0},stroke:"#c2c5c
 var boxed = new Skin({borders:{left:2,right:2,top:2,bottom:2},stroke:"#c2c5c8"});
 
 /** STYLES **/
-var statusStyle = new Style({font:"bold 50px Heiti SC", color:"black"});
+var statusStyle = new Style({font:"bold 24px Heiti SC", color:"black"});
 var tempStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
 var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
 
 /** LABELS **/
-var statusLabel = new Label({left: 0, right: 0, height: 70, top: 20,string: "OFF", style: statusStyle})
+var statusLabel = new Label({left: 0, right: 0, height: 70, top: 20, string: "OFF", style: statusStyle})
 var currTemp = new Label({top:0, left:15, height:40, string: "Current Temp:", style: tempStyle})
 var currTempVal = new Label({top:0, left:160, height:40, string: "---", style: tempStyle})
 var currDeg = new Label({top:0, right:40, height:40, string: "°F", style: tempStyle})
@@ -37,6 +37,10 @@ var setTempVal = new Label({right:85, height: 35,width:50, string: "", style: te
 var degrees = new Label({string: "°F",right:40,style:tempStyle});
 var setTempLabel = new Label({left: 20, height: 60, string: "Set Temp:", style: tempStyle})
 
+/** VALUES **/
+var deviceURL = "";
+var curOvenTemp = 0;
+var goalOvenTemp = 0;
 
 /* Button that brings up the keyboard */
 var canAdd = 1;
@@ -61,14 +65,6 @@ var setTempButton = new showKeyTemplate({label:setTempVal,top:0, left:0, right:0
 var setTempBg = new Picture({right:0,left:0, url: "buttons/settemp3.png"});
 var numBox = new Picture({left:60,height:40, url: "buttons/box.png"});
 var setTempCon = new Container({left:20,right:20,top:0, height: 50,contents: [setTempBg,numBox,setTempButton,setTempLabel,setTempVal,degrees]});
-
-
-
-
-
-
-
-
 
 
 /*************************************************************/
@@ -198,7 +194,7 @@ var schedulesTemplate = BUTTONS.Button.template(function($){ return{
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
 			trace("temp button pressed");
-			application.invoke(new Message("/discover"));
+			application.invoke(new Message("/schedules"));
 			schedBg.url = "buttons/settemp.png"
 		}},
 		onTouchBegan: { value:  function(button){
@@ -390,13 +386,65 @@ var timeCamCon = new Container({left:20, right:20, top:gap,height: 200, contents
 /****************/
 /*ACTIONS!! 
 /****************/
+
+Handler.bind("/discover", Behavior({
+	onInvoke: function(handler, message){
+		deviceURL = JSON.parse(message.requestText).url;
+		trace("discovered device\n");
+	}
+}));
+
+Handler.bind("/forget", Behavior({
+	onInvoke: function(handler, message){
+		deviceURL = "";
+	}
+}));
+
 //**** what happens after changing "Set Temperature" ***//
 // setTempVal.string is the val just set
 // currTempVal.string is the current temperature string (to be updated)
 Handler.bind("/setTemp", Behavior({
-	onInvoke: function(handler, message){
-	statusLabel.string = "Heating..."
+	onInvoke: function(handler, message) {
+		var msg = new Message(deviceURL + "setGoalTemp");
+		var goalTemp = parseInt(setTempVal.string);	
+		msg.requestText = goalTemp;
+		if (deviceURL != "") handler.invoke(msg, Message.JSON);
 	},
+	onComplete: function(content, message, json) {
+		goalOvenTemp = json.goalTemp;
+		
+		if (goalOvenTemp == curOvenTemp) {
+	      statusLabel.string = "The oven is already at this temperature";
+	    } else {
+	      if (goalOvenTemp > curOvenTemp) {
+	        action = "heating up";
+	      } else {
+	        action = "cooling down";
+	      }
+	      statusLabel.string = "The oven is " + action + " to " + goalOvenTemp + " degrees";
+	    }
+	}
+}));
+
+//the device pushes the temperature to the phone
+Handler.bind("/gotCurrentTemp", Behavior({
+	onInvoke: function(handler, message, json) {
+		//update the display of the current temperature
+		curOvenTemp = message.requestText;
+		currTempVal.string = curOvenTemp;
+	}
+}));
+
+//the device pushes smoke detection to the phone
+Handler.bind("/smokeDetectedAlert", Behavior({
+	onInvoke: function(handler, message){
+		statusLabel.string = "Smoke detected in oven!";
+	}
+}));
+Handler.bind("/smokeDetectedAllClear", Behavior({
+	onInvoke: function(handler, message){
+		smokeDetectedLabel.string = "Smoke detector all clear";
+	}
 }));
 
 //*** stuff for Timer
