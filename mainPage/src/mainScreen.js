@@ -23,12 +23,13 @@ var borderedV = new Skin({borders:{left:1,right:1,top:0,bottom:0},stroke:"#c2c5c
 var boxed = new Skin({borders:{left:2,right:2,top:2,bottom:2},stroke:"#c2c5c8"});
 
 /** STYLES **/
-var statusStyle = new Style({font:"bold 50px Heiti SC", color:"black"});
+var statusStyle = new Style({font:"bold 45px Heiti SC", color:"black"});
+var offStyle = new Style({font:"bold 70px Heiti SC", color:"black"});
 var tempStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
 var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
 
 /** LABELS **/
-var statusLabel = new Label({left: 0, right: 0, height: 70, top: 20,string: "OFF", style: statusStyle})
+var statusLabel = new Label({left: 0, right: 0, height: 70, top: 15,string: "OFF", style: offStyle})
 var currTemp = new Label({top:0, left:15, height:40, string: "Current Temp:", style: tempStyle})
 var currTempVal = new Label({top:0, left:160, height:40, string: "---", style: tempStyle})
 var currDeg = new Label({top:0, right:40, height:40, string: "°F", style: tempStyle})
@@ -36,8 +37,30 @@ var currTempCon = new Container({top:0,left:20,right:20,height:40, contents: [cu
 var setTempVal = new Label({right:85, height: 35,width:50, string: "", style: tempStyle});
 var degrees = new Label({string: "°F",right:40,style:tempStyle});
 var setTempLabel = new Label({left: 20, height: 60, string: "Set Temp:", style: tempStyle})
+var offLabel = new Label({left:0, right:0,top:0, string:"Turn Off", style:whiteStyle});
+var offBg = new Picture({left:50,right:50,top:0, url:"buttons/offBg.png"});
+var offTemp = BUTTONS.Button.template(function($){ return{
+		top:65,left:70, right:70,width:100,height:30, skin:clearS,
+	contents:[offLabel],
+	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+		onTap: { value:  function(button){
+			offBg.url = "buttons/offBg.png"
+			setTempVal.string = ""
+			statusLabel.string = "OFF";
+			statusLabel.style = offStyle;
+			statusLabel.coordinates = {top:15,right:0,left:0};
+			statusCon.remove(offButton)
+			statusCon.remove(offBg);
+			offButtonPresent = 0;
+		}},
+		onTouchBegan: { value:  function(button){
+			offBg.url = "buttons/offBg2.png"
+		}}
+	})
+}});
 
-
+var offButton = new offTemp({});
+var statusCon = new Container({top:10, left:0,right:0, height:90, contents: [statusLabel]});
 /* Button that brings up the keyboard */
 var canAdd = 1;
 var showKeyTemplate = BUTTONS.Button.template(function($){ return{
@@ -56,19 +79,17 @@ var showKeyTemplate = BUTTONS.Button.template(function($){ return{
 	})
 }});
 
+
+/** VALUES **/
+var deviceURL = "";
+var curOvenTemp = 0;
+var goalOvenTemp = 0;
+
 /* Set Temp container */
 var setTempButton = new showKeyTemplate({label:setTempVal,top:0, left:0, right:0,height:50,field: "/setTemp" });
 var setTempBg = new Picture({right:0,left:0, url: "buttons/settemp3.png"});
 var numBox = new Picture({left:60,height:40, url: "buttons/box.png"});
 var setTempCon = new Container({left:20,right:20,top:0, height: 50,contents: [setTempBg,numBox,setTempButton,setTempLabel,setTempVal,degrees]});
-
-
-
-
-
-
-
-
 
 
 /*************************************************************/
@@ -197,8 +218,7 @@ var schedulesTemplate = BUTTONS.Button.template(function($){ return{
 	],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
-			trace("temp button pressed");
-			application.invoke(new Message("/discover"));
+			application.invoke(new Message("/schedules"));
 			schedBg.url = "buttons/settemp.png"
 		}},
 		onTouchBegan: { value:  function(button){
@@ -216,7 +236,6 @@ var schedulesButton = new schedulesTemplate({bottom:0,textForLabel:"Schedules >"
 date = 0;
 function convertTime(str) {
 	hours = parseInt(str.substring(0,2));
-	//trace(hours);
 	mins = parseInt(str.substring(3,5));
 	secs = parseInt(str.substring(6,8));
 	if (secs == 0) {
@@ -254,7 +273,6 @@ var startTimerTemp = BUTTONS.Button.template(function($){ return{
 	],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
-			trace("HAYY");
 			startTimerBg.url = "buttons/startTimerBg.png";
 			timeCamCon.remove(timerCon);
 			countdownLabel.string = hourVal.string + ":" + minVal.string + ":00"
@@ -358,7 +376,6 @@ var timeCamTemplate = BUTTONS.Button.template(function($){ return{
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
 		if ($.type == "cam") {
-			trace(camView);
 			if (camView == 0) {
 				if (countdown == 1) {
 					timeCamCon.remove(countdownCon);
@@ -381,22 +398,93 @@ var timeCamTemplate = BUTTONS.Button.template(function($){ return{
 	})
 }});
 
-
+var camButtonIcon = new Picture({top:-110, left:10, width:40,url:"buttons/camIcon.png"})
 var camButton = new timeCamTemplate({type:"cam",left:0});
+var timerButtonIcon = new Picture({top:-110, left:75, width:30,url:"buttons/timerIcon.png"})
 var timerButton = new timeCamTemplate({type:"timer",left:60});
 
-var timeCamCon = new Container({left:20, right:20, top:gap,height: 200, contents: [timerCon,camButton,timerButton]});
+var timeCamCon = new Container({left:20, right:20, top:gap,height: 200, contents: [timerCon,timerButtonIcon, camButtonIcon,camButton,timerButton]});
 
 /****************/
 /*ACTIONS!! 
 /****************/
+/**discover device **/
+Handler.bind("/discover", Behavior({
+	onInvoke: function(handler, message){
+		deviceURL = JSON.parse(message.requestText).url;
+		trace("discovered device\n");
+	}
+}));
+
+/** forget device **/
+Handler.bind("/forget", Behavior({
+	onInvoke: function(handler, message){
+		deviceURL = "";
+	}
+}));
+
+var offButtonPresent = 0;
 //**** what happens after changing "Set Temperature" ***//
 // setTempVal.string is the val just set
 // currTempVal.string is the current temperature string (to be updated)
 Handler.bind("/setTemp", Behavior({
-	onInvoke: function(handler, message){
-	statusLabel.string = "Heating..."
+		onInvoke: function(handler, message) {
+		var msg = new Message(deviceURL + "setGoalTemp");
+		var goalTemp = parseInt(setTempVal.string);	
+		msg.requestText = goalTemp;
+		if (offButtonPresent == 0) {
+			statusCon.add(offBg);
+			statusCon.add(offButton);
+			offButtonPresent = 1;
+			}
+		if (deviceURL != "") handler.invoke(msg, Message.JSON);
 	},
+	onComplete: function(content, message, json) {
+		goalOvenTemp = json.goalTemp;
+		
+		if (goalOvenTemp == curOvenTemp) {
+	      statusLabel.string = "The oven is already at this temperature";
+	    } else {
+	      if (goalOvenTemp > curOvenTemp) {
+	        action = "Heating Up";
+	      } else {
+	        action = "Cooling Down";
+	      }
+	      statusLabel.string = action
+	      statusLabel.style = statusStyle;
+	      statusLabel.coordinates = {top:5,left:0,right:0};
+	    }
+	}
+}));
+/*
+	onInvoke: function(handler, message){
+		statusLabel.string = "Heating..."
+		statusLabel.style = statusStyle;
+		statusLabel.coordinates = {top:5,left:0,right:0};
+		statusCon.add(offBg);
+		statusCon.add(offButton);
+		}
+})); */
+
+//the device pushes the temperature to the phone
+Handler.bind("/gotCurrentTemp", Behavior({
+	onInvoke: function(handler, message, json) {
+		//update the display of the current temperature
+		curOvenTemp = message.requestText;
+		currTempVal.string = curOvenTemp;
+	}
+}));
+
+//the device pushes smoke detection to the phone
+Handler.bind("/smokeDetectedAlert", Behavior({
+	onInvoke: function(handler, message){
+		statusLabel.string = "Smoke detected in oven!";
+	}
+}));
+Handler.bind("/smokeDetectedAllClear", Behavior({
+	onInvoke: function(handler, message){
+		smokeDetectedLabel.string = "Smoke detector all clear";
+	}
 }));
 
 //*** stuff for Timer
@@ -447,7 +535,7 @@ exports.mainColumn = new Column.template(function($) { return ({
 	left: 0, right: 0, top: 0, bottom: 0,
 	skin: whiteSkin,
 	contents:[
-		statusLabel,
+		statusCon,
 		currTempCon,
 		setTempCon,
 		timeCamCon,
