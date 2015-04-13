@@ -2,6 +2,7 @@
 /****** Key Button templates *****/
 
 /*Skins */
+var greenS = new Skin({fill:"#67BFA0"});
 var keySkin = new Skin({fill:"#fcfdfd",borders:{left:0,right:0,top:0,bottom:1},stroke:"#c2c5c8"});
 var darkGreyS = new Skin({fill:"#c2c5c8"});
 var greyS = new Skin({fill:"#fcfdfd"});
@@ -10,6 +11,51 @@ var bordered = new Skin({borders:{left:0,right:0,top:1,bottom:1},stroke:"#c2c5c8
 var borderedV = new Skin({borders:{left:1,right:1,top:0,bottom:0},stroke:"#c2c5c8"});
 var boxed = new Skin({borders:{left:2,right:2,top:2,bottom:2},stroke:"#c2c5c8"});
 var keyHeight = 50
+
+var tempStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
+var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
+
+
+
+
+var editedLabel = ""
+/* Changes the value of "Set Temp:" when you type */
+function newTempVal(value) {
+	//trace(editedLabel.string);
+	if (value == "del") {
+		str = editedLabel.string
+		editedLabel.string = str.substring(0,str.length-1);
+		}
+	else if (editedLabel.string.length < max) {
+	 editedLabel.string+= value
+	 }
+	 else if (editedLabel.string.substring(0,1) == "0") {
+	 	trace(editedLabel.string);
+	 	editedLabel.string = editedLabel.string.substring(1,2) + value
+	}
+	}
+	
+var canAdd = 1;
+exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
+		top:$.top,left:$.left, right:$.right, width:$.width, label:$.label,max:$.max, field: $.field, height: $.height,skin:$.skin,keyboard:$.keyboard,
+	contents:$.contents,
+	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+		onTap: { value:  function(button){
+			editedLabel = $.label
+			max = $.max
+			if (canAdd) {				
+				application.add(numKeyboard);
+				fieldString = $.field
+				application.invoke(new Message(fieldString+"Open"));
+				}
+			canAdd = 0;
+		}},
+	})
+}});
+
+
+
+
 
 //Number keys
 var keyTemplate = BUTTONS.Button.template(function($){ return{
@@ -51,6 +97,7 @@ var enterKeyTemplate = BUTTONS.Button.template(function($){ return{
 			button.skin = greenS;
 			application.remove(numKeyboard);
 			canAdd = 1;
+			application.invoke(new Message(fieldString));
 		}},
 		onTouchBegan: { value:  function(button){
 			button.skin = greyS
@@ -99,4 +146,4 @@ var thirdRow = new Container({left:0, right:0, top:0,height: keyHeight,skin: gre
 var fourthRow = new Container({left:0, right:0, top:0,height: keyHeight,skin:darkGreyS, contents: [zeroButton,delButton,blank,zero,del]})
 
 /*The keyboard */
-var numKeyboard = new Column(function($) { return {right:0,left:0, bottom:0,contents: [enterKey, firstRow,secondRow,thirdRow,fourthRow]}});
+var numKeyboard = new Column( {right:0,left:0, bottom:0,contents: [enterKey, firstRow,secondRow,thirdRow,fourthRow]});
