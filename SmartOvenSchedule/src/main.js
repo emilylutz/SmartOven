@@ -59,20 +59,32 @@ var nameField = Container.template(function($) { return {
   ]
 }});
 
+var labelArrow = new Label({ left:78, style:fieldStyle, string:"▾"});
 var actionField = Container.template(function($) { return { 
-  top:0, width: 100, skin: nameInputSkin, active:true, contents: [
+  top:0, width: 100, skin: nameInputSkin, active:true, 
+  behavior: Object.create(Behavior.prototype, {
+  	onTouchEnded: { value: function(container, id, x,  y, ticks) {
+		if (info.menu == false) {
+		actionContainer.add(dropDownMenu);
+		labelArrow.string = "";
+		info.menu = true;
+		}
+	}}
+	}),
+  contents: [
         Label($, { 
-          skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
+          style: fieldStyle, anchor: 'NAME',
           string: $.name, active:true, name: "lbl",
-         	behavior: Object.create(Behavior.prototype, {
-         		onTouchEnded: { value: function(container, id, x,  y, ticks) {
-	        	    if (info.menu == false) {
-	        	    	actionContainer.add(dropDownMenu);
-	        	    	info.menu = true;
-	        	    }
-	        	}}
-         	}),
-         })
+          behavior: Object.create(Behavior.prototype, {
+  			onTouchEnded: { value: function(container, id, x,  y, ticks) {
+				if (info.menu == false) {
+				actionContainer.add(dropDownMenu);
+				labelArrow.string = "";
+				info.menu = true;
+			}}}}),
+        }),
+        
+        labelArrow
   ]
 }});
 
@@ -88,6 +100,7 @@ var DropDownMenu = Container.template(function($) { return {
 				        	    	   aField.lbl.string = "Bake";
 				        	    	   info.action = "Bake";
 			        				   info.menu = false;
+			        				   labelArrow.string = "▾";
 			        	    	}}
 			        	    })     	    	
 			           }),
@@ -98,6 +111,7 @@ var DropDownMenu = Container.template(function($) { return {
 			        			   	   aField.lbl.string = "Broil";
 			        			   	   info.action = "Broil";
 			        			   	   info.menu = false;
+			        			   	   labelArrow.string = "▾";
 			        	    	}}
 			        	    })   
 			           }),			           
