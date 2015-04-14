@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<application xmlns="http://www.kinoma.com/kpr/application/1" id="oven" program="src/main" title="Oven">
+<application xmlns="http://www.kinoma.com/kpr/application/1" id="smartovenphone.app" program="src/main" title="SmartOvenPhone">
 
 </application>

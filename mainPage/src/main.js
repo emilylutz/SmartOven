@@ -12,7 +12,7 @@ var whiteSkin = new Skin({ fill: 'white',});
 var MainScreen = Container.template(function($) { return { left: 0, right: 0, top: 0, bottom: 0, contents: [], }});
 
 /* Transition from statusScreen (main page) to schedScreen (schedules page) */
-Handler.bind("/discover", Behavior({
+Handler.bind("/schedules", Behavior({
 	onInvoke: function(handler, message){
 		mainScreen.run( new TRANSITIONS.Push(), statusScreen, schedScreen, { direction : "left", duration : 300 } );
 	},
@@ -39,8 +39,24 @@ Handler.bind("/setTimer", Behavior({
 var mainScreen = new MainScreen();
 
 /** Screens **/
-var statusScreen = new SS.mainColumn()
+
+var statusScreen = new SS.mainColumn();
 var schedScreen = new TS.MainCon();
 
-application.add( mainScreen )
+var ApplicationBehavior = Behavior.template({
+	onLaunch: function(application) {
+		application.shared = true;
+	},
+	onDisplayed: function(application) {
+		application.discover("smartovendevice.app");
+	},
+	onQuit: function(application) {
+		application.forget("smartovendevice.app");
+		application.shared = false;
+	},
+})
+
+application.behavior = new ApplicationBehavior();
+
+application.add( mainScreen );
 mainScreen.add( statusScreen )

@@ -1,4 +1,4 @@
- //@module
+//@module
 var THEME = require('themes/flat/theme');
 var BUTTONS = require('controls/buttons');
 var CONTROL = require('mobile/control');
@@ -46,14 +46,7 @@ var offTemp = BUTTONS.Button.template(function($){ return{
 	contents:[offLabel],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
-			offBg.url = "buttons/offBg.png"
-			setTempVal.string = ""
-			statusLabel.string = "OFF";
-			statusLabel.style = offStyle;
-			statusLabel.coordinates = {top:15,right:0,left:0};
-			statusCon.remove(offButton)
-			statusCon.remove(offBg);
-			offButtonPresent = 0;
+			application.invoke(new Message("/turnOff"));
 		}},
 		onTouchBegan: { value:  function(button){
 			offBg.url = "buttons/offBg2.png"
@@ -68,7 +61,7 @@ var statusCon = new Container({top:10, left:0,right:0, height:90, contents: [sta
 
 ///*** Smoke Alert ***///
 
-var smokeMessage = new Label({left:0,right:0,top:20, string:"SMOKE DETECTED!!", style: alertStyle});
+var smokeMessage = new Label({left:0,right:0,top:20, string:"SMOKE DETECTED!", style: alertStyle});
 var smokeMessage2 = new Label({left:0,right:0,top:50, string:"oven has been turned off", style: tempStyle});
 var smokeBox = new Picture({left:0, top:0, right:0,bottom:0,  url:"buttons/smokebox.png"});
  
@@ -100,6 +93,7 @@ behavior: Object.create(Behavior.prototype, {
 var deviceURL = "";
 var curOvenTemp = 0;
 var goalOvenTemp = 0;
+var ovenOn = false;
 
 /* Set Temp container */
 var setTempButton = new KEYBOARD.openKeyboardTemplate({label:setTempVal,max:3, top:0, left:0, right:0,height:50,field: "/setTemp" });
@@ -139,7 +133,7 @@ function convertTime(str) {
 		if (mins == 0) {
 			if (hours == 0) {
 			application.add(timerAlertCon);
-			return "DONE!!"
+			return "DONE!"
 			}
 			hours = hours - 1;
 			mins = 59;
@@ -309,6 +303,23 @@ var timeCamCon = new Container({left:20, right:20, top:gap,height: 200, contents
 /****************/
 /*ACTIONS!! 
 /****************/
+Handler.bind("/turnOff", Behavior({
+	onInvoke: function(handler, message){
+		if(ovenOn){
+			offBg.url = "buttons/offBg.png"
+			setTempVal.string = ""
+			statusLabel.string = "OFF";
+			application.invoke(new Message(deviceURL + "turnOffOven"));
+			statusLabel.style = offStyle;
+			statusLabel.coordinates = {top:15,right:0,left:0};
+			statusCon.remove(offButton)
+			statusCon.remove(offBg);
+			offButtonPresent = 0;
+			ovenOn = false;
+		}
+	}
+}));
+
 /**discover device **/
 Handler.bind("/discover", Behavior({
 	onInvoke: function(handler, message){
@@ -342,7 +353,11 @@ Handler.bind("/setTemp", Behavior({
 	},
 	onComplete: function(content, message, json) {
 		goalOvenTemp = json.goalTemp;
-		
+		statusLabel.string = "Heating";
+		statusLabel.style = statusStyle;
+	    statusLabel.coordinates = {top:5,left:0,right:0};
+	    ovenOn = true;
+		/*
 		if (goalOvenTemp == curOvenTemp) {
 	      statusLabel.string = "The oven is already at this temperature";
 	    } else {
@@ -355,6 +370,7 @@ Handler.bind("/setTemp", Behavior({
 	      statusLabel.style = statusStyle;
 	      statusLabel.coordinates = {top:5,left:0,right:0};
 	    }
+	    */
 	}
 }));
 /*
@@ -380,13 +396,16 @@ Handler.bind("/gotCurrentTemp", Behavior({
 Handler.bind("/smokeDetectedAlert", Behavior({
 	onInvoke: function(handler, message){
 		//statusLabel.string = "Smoke detected in oven!";
+		application.invoke(new Message("/turnOff"));
 		application.add(smokeAlertCon);
 	}
 }));
 Handler.bind("/smokeDetectedAllClear", Behavior({
 	onInvoke: function(handler, message){
-		statusLabel.string = "No more smoke detected.";
-		statusLabel.style = tempStyle;
+		//statusLabel.string = "No more smoke detected.";
+		
+		
+		//statusLabel.style = tempStyle;
 	}
 }));
 
@@ -399,7 +418,7 @@ Handler.bind("/getTime", {
 	       	var msg = new Message(deviceURL + "setTimer");
 	        msg.requestText = countdownLabel.string;
 	        application.invoke(msg);
-	        if (countdownLabel.string == "DONE!!" ){
+	        if (countdownLabel.string == "DONE!" ){
 	        		timeCamCon.remove(countdownCon);
 					timeCamCon.add(timerCon);
 					countdown = 0;
