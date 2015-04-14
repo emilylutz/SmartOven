@@ -164,6 +164,9 @@ var startTimerTemp = BUTTONS.Button.template(function($){ return{
 			startTimerBg.url = "buttons/startTimerBg.png";
 			timeCamCon.remove(timerCon);
 			countdownLabel.string = hourVal.string + ":" + minVal.string + ":00"
+			var msg = new Message(deviceURL + "setTimer");
+	        msg.requestText = countdownLabel.string;
+	        application.invoke(msg);
 			timeCamCon.add(countdownCon);
 			countdown = 1;
 			application.invoke(new Message("/getTime"));
@@ -372,7 +375,7 @@ Handler.bind("/smokeDetectedAlert", Behavior({
 }));
 Handler.bind("/smokeDetectedAllClear", Behavior({
 	onInvoke: function(handler, message){
-		smokeDetectedLabel.string = "Smoke detector all clear";
+		statusLabel.string = "No more smoke detected.";
 	}
 }));
 
@@ -382,6 +385,9 @@ Handler.bind("/getTime", {
     onInvoke: function(handler, message){
     	if (pause == 0) {
 	        countdownLabel.string = convertTime(countdownLabel.string);
+	        var msg = new Message(deviceURL + "setTimer");
+	        msg.requestText = countdownLabel.string;
+	        application.invoke(msg);
 	        if (countdownLabel.string == "DONE!!" ){
 	        		timeCamCon.remove(countdownCon);
 					timeCamCon.add(timerCon);
