@@ -29,6 +29,7 @@ var offStyle = new Style({font:"bold 70px Heiti SC", color:"black"});
 var tempStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
 var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
 var alertStyle = new Style({font:"bold 30px Heiti SC", color: "red"});
+var timerAlertStyle = new Style({font:"bold 35px Heiti SC", color: "black"});
 /** LABELS **/
 var statusLabel = new Label({left: 0, right: 0, height: 70, top: 15,string: "OFF", style: offStyle})
 var currTemp = new Label({top:0, left:15, height:40, string: "Current Temp:", style: tempStyle})
@@ -70,19 +71,27 @@ var statusCon = new Container({top:10, left:0,right:0, height:90, contents: [sta
 var smokeMessage = new Label({left:0,right:0,top:20, string:"SMOKE DETECTED!!", style: alertStyle});
 var smokeMessage2 = new Label({left:0,right:0,top:50, string:"oven has been turned off", style: tempStyle});
 var smokeBox = new Picture({left:0, top:0, right:0,bottom:0,  url:"buttons/smokebox.png"});
-var okayLabel = new Label({left:30,right:30, top:80, height:40, string:"okay",style:whiteStyle, skin:darkGreyS});
-var smokeAlertCon = new Container({left:10,right:10, top:100, height:150, active:true,
+ 
+var alertCon = new Container.template(function($) { return {left:10,right:10, top:$.top, height:150,label:$.label, active:true,
 behavior: Object.create(Behavior.prototype, {
 	onTouchEnded: { value:  function(button){
-		application.remove(smokeAlertCon);
+		$.label.skin = darkGreyS
+		application.remove(button);
 		}},
    	onTouchBegan: { value: 
      	 function(button) {
-     	 okayLabel.skin = greyS
+     	 $.label.skin = greyS
          
       }
    },}),
- contents:[smokeBox, smokeMessage,smokeMessage2,okayLabel]});
+ contents:$.contents
+ }});
+ var timerBox = new Picture({left:0, top:0, right:0,bottom:0,  url:"buttons/timerBox.png"});
+ var timerMessage = new Label({left:0,right:0,top:30, string:"Timer Done!", style: timerAlertStyle});
+ var okayLabel = new Label({left:30,right:30, top:80, height:40, string:"okay",style:whiteStyle, skin:darkGreyS})
+ var smokeAlertCon = new alertCon({label:okayLabel, top:130, contents: [ smokeBox,smokeMessage,smokeMessage2, okayLabel]});
+ var okayLabelTimer = new Label({left:30,right:30, top:80, height:40, string:"okay",style:whiteStyle, skin:darkGreyS})
+ var timerAlertCon = new alertCon({label:okayLabelTimer,top:130, contents: [timerBox,timerMessage,okayLabelTimer]});
 
 
 
@@ -129,6 +138,7 @@ function convertTime(str) {
 	if (secs == 0) {
 		if (mins == 0) {
 			if (hours == 0) {
+			application.add(timerAlertCon);
 			return "DONE!!"
 			}
 			hours = hours - 1;
@@ -232,7 +242,7 @@ var pauseButton = new resetPauseTemp({str: "Pause", label: pauseStartLabel,left:
 var countDownTab = new Picture({left:0,right:0, url: "buttons/timerTab.png"});
 var startTimerButton = new startTimerTemp({textForLabel:"Start Timer"});
 var startTimerBg = new Picture({top:35,left:30,right:30, url: "buttons/startTimerBg.png"});
-var countdownLabel = new Label({top:0, bottom:0, string: "10:00:00", style:statusStyle});
+var countdownLabel = new Label({top:0, bottom:0, string: "00:00:05", style:statusStyle});
 var countdownCon = new Container({ left:0,right:0,height:150, contents : [countDownTab,resetBg, pauseBg, countdownLabel,resetButton,pauseButton]});
 
 
@@ -376,6 +386,7 @@ Handler.bind("/smokeDetectedAlert", Behavior({
 Handler.bind("/smokeDetectedAllClear", Behavior({
 	onInvoke: function(handler, message){
 		statusLabel.string = "No more smoke detected.";
+		statusLabel.style = tempStyle;
 	}
 }));
 
@@ -385,7 +396,7 @@ Handler.bind("/getTime", {
     onInvoke: function(handler, message){
     	if (pause == 0) {
 	        countdownLabel.string = convertTime(countdownLabel.string);
-	        var msg = new Message(deviceURL + "setTimer");
+	       	var msg = new Message(deviceURL + "setTimer");
 	        msg.requestText = countdownLabel.string;
 	        application.invoke(msg);
 	        if (countdownLabel.string == "DONE!!" ){
