@@ -2,12 +2,10 @@ var THEME = require('themes/sample/theme');
 var CONTROL = require('mobile/control');
 var KEYBOARD = require('mobile/keyboard');
 var BUTTONS = require('controls/buttons');
-var SCROLLER = require('mobile/scroller');
 var NUMKEYBOARD = require("numKeyboard.js");
 
 /*STYLES*/
 var labelStyle = new Style({ font:"16px Heiti SC", color:"black", horizontal:"center", vertical:"middle" });
-var errorStyle = new Style({ font:"11px Heiti SC", color:"red", horizontal:"center", vertical:"middle" });
 var whiteLabelStyle = new Style({ font:"16px Heiti SC", color:"white", horizontal:"center", vertical:"middle" });
 var menuStyle = new Style({ font:"15px Heiti SC", color:"black", horizontal:"center", vertical:"top" });
 var titleStyle = new Style({ font:"28px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
@@ -41,11 +39,11 @@ var step = 1;
 var nameField = Container.template(function($) { return { 
   width: 220, height:29, skin: nameInputSkin, contents: [
     Scroller($, { 
-      left: 4, right: 4, top: 4, bottom: 4, active: true, name:"scroller", 
+      left: 4, right: 4, top: 4, bottom: 4, active: true, 
       behavior: Object.create(CONTROL.FieldScrollerBehavior.prototype), clip: true, contents: [
         Label($, { 
           left: 0, top: 0, bottom: 0, skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
-          editable: true, string: $.name, name:"nameLabel",
+          editable: true, string: $.name,
          	behavior: Object.create( CONTROL.FieldLabelBehavior.prototype, {
          		onEdited: { value: function(label){
          			var data = this.data;
@@ -111,8 +109,7 @@ var DropDownMenu = Container.template(function($) { return {
 }});
 
 /* name */
-var nField = new nameField({name: ""});
-var nameContainer = new Line({left:10, top:23, contents:[nField]});
+var nameContainer = new Line({left:10, top:23, contents:[new nameField({ name: "" })]});
 
 /* action */
 var aField = new actionField({ name: "Action" });
@@ -158,19 +155,11 @@ function reinitialize() {
 	info.hour = 0;
 	info.minutes = 0;
     info.menu = false;
-    stepLabel.string = "Step " + step;
     aField.lbl.string = "Action";
     temperatureField.string = "Temperature";
     hourField.string = "--";
     minuteField.string = "--";
 };
-function allFieldsFilled() {
-	if (aField.lbl.string == "Action" | temperatureField.string == "Temperature" | hourField.string == "--" | minuteField.string == "--") {
-		return false;
-	} else return true;
-};
-var errorMessage = new Label({top:10, string:"**Please fill in all of the fields before adding a step.", style:errorStyle});
-var hasError = false;
 var addButtonTemplate = BUTTONS.Button.template(function($){ return{
 		height: 35, width: 90, skin:greenS,
         contents: [
@@ -182,27 +171,17 @@ var addButtonTemplate = BUTTONS.Button.template(function($){ return{
 				}},
 				onTouchEnded: { value:  function(button){
 					button.skin = greenS;
-					if (allFieldsFilled()) {
-						if (hasError) {
-							mainFieldContainer.remove(errorMessage);
-						}
-						updateInfo();
-                    	var info1 = "Step " + step + ": " + info.action + " at " + info.temperature + "°F";
-                    	info1Label = new Label({top:5, left:0, bottom:0, height:20, string:info1, style: labelStyle});
-                    	var info2 = "for " + info.hour + " hours and " + info.minutes + " minutes";
-                    	info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
-                    	addLabelContainer = new Column({left:0, right:0,contents: [info1Label, info2Label]});
-                    	instructionContainer.col.add(addLabelContainer);
-                    	mainFieldContainer.remove(fieldContainer);
-                    	step++;
-                    	reinitialize();
-    					mainFieldContainer.add(fieldContainer);
-    				} else {
-    					if (!hasError) {
-    						mainFieldContainer.add(errorMessage);
-    						hasError = true;
-    					}
-    				}
+					updateInfo();
+                    var info1 = "Step " + step + ": " + info.action + " at " + info.temperature + "°F";
+                    info1Label = new Label({top:5, left:0, bottom:0, height:20, string:info1, style: labelStyle});
+                    var info2 = "for " + info.hour + " hours and " + info.minutes + " minutes";
+                    info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
+                    addLabelContainer = new Column({left:0, right:0,contents: [info1Label, info2Label]});
+                    instructionContainer.col.add(addLabelContainer);
+                    mainContainer.mainCol.subCol.remove(fieldContainer);
+                    reinitialize();
+                    mainContainer.mainCol.subCol.add(fieldContainer);
+                    step++;
 				}}
         })
 }});
@@ -215,14 +194,13 @@ var addButtonContainerTemplate = Container.template(function($) { return {
 /* time */
 var timeLabel = new Label({ left:4, style: labelStyle, string: "Time"});
 var colonLabel = new Label({ style: labelStyle, string: ":"});
-var timeContainer = new Line({left:0, top:5, bottom:10, contents:[timeLabel, hourContainer, colonLabel, minuteContainer, new addButtonContainerTemplate()]});
+timeContainer = new Line({left:0, top:5, bottom:10, contents:[timeLabel, hourContainer, colonLabel, minuteContainer, new addButtonContainerTemplate()]});
 
 /* field container template */
-var stepLabel = new Label({top:10, left:0, string:"Step 1", style:labelStyle});
 var fieldContainerTemplate = Container.template(function($) { return {
 	name:"fieldContainer", top:10,skin: greenBorderS, active: true,
 	contents: [
-		new Column({left:20, top:0, right:25, width: 270, contents:[stepLabel,tempActionContainer,timeContainer]})
+		new Column({left:10, top:0, right:25, width: 270, contents:[tempActionContainer,timeContainer]})
 	]
 }});
 var fieldContainer = new fieldContainerTemplate();
@@ -234,9 +212,6 @@ var instructionContainerTemplate = Container.template(function($) { return {
 var instructionContainer = new instructionContainerTemplate();
 
 /* doneButton */
-var noStepsErrorMessage = new Label({top:15, string:"**Please add a step to your schedule before saving.", style:errorStyle});
-var noNameErrorMessage = new Label({top:15, string:"**Please name your schedule before saving.", style:errorStyle});
-var hasDoneError = false;
 var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
         height: 35, width: 150, skin:greenS,
         contents: [
@@ -248,45 +223,16 @@ var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
 				}},
 				onTouchEnded: { value:  function(button){
 					button.skin = greenS;
-					if (step == 1) {
-						if (!hasDoneError) {
-							mainContainer.mainCol.add(noStepsErrorMessage);
-							hasDoneError = true;
-						}
-					} else {
-						if (hasDoneError) {
-							mainContainer.mainCol.remove(doneErrorMessage);
-						}
-						doneMessage = new Label({top:20, string:"Your schedule has been saved!", style: labelStyle});
-                		mainContainer.mainCol.add(doneMessage);
-					}
+					doneMessage = new Label({top:20, string:"Your schedule has been saved!", style: labelStyle});
+                	mainContainer.mainCol.add(doneMessage);
 				}}
         })
 }});
 
 var doneButton = new doneButtonTemplate();
 var doneButtonContainerTemplate = Container.template(function($) { return {
-	top:10, left:10, bottom: 20, contents:[doneButton]
+	top:10, left:10, contents:[doneButton]
 }});
-
-var scroller = SCROLLER.VerticalScroller.template(function($){ return{
-    contents: $.contents
-}});
-
-var mainFieldContainer = new Column({name:"subCol", contents:[fieldContainer, instructionContainer]});
-
-var subContainer = new Column({top:0, left:0, right:0, contents:[
-	new Container({height: 60, left:0, right:0, skin:greenS, top:0,
-		contents: [
-			new Label({left:15, string: "Set schedule:", style: titleStyle})
-		]
-	}),
-	nameContainer,
-	mainFieldContainer,
-	new Container({top:20, contents: [new doneButtonContainerTemplate()]})
-]});
-
-var mainScroller = new scroller({contents: [subContainer]});
 
 var MainContainerTemplate = Container.template(function($) { return {
   left: 0, right: 0, top: 0, bottom: 0, skin: whiteSkin, active: true,
@@ -297,7 +243,19 @@ var MainContainerTemplate = Container.template(function($) { return {
     }}
   }),
   contents: [
-  	new Column({left:0, right:0, top:0, bottom:0, name:"mainCol",contents: [mainScroller]})
+  	new Column({
+		left:0, right:0, top:0, bottom:0, name:"mainCol",
+		contents: [
+			new Container({height: 60, left:0, right:0, skin:greenS, top:0,
+				contents: [
+					new Label({left:15, string: "Set schedule:", style: titleStyle})
+				]
+			}),
+			nameContainer,
+			new Column({name:"subCol", contents:[fieldContainer, instructionContainer]}),
+			new Container({top:20, contents: [new doneButtonContainerTemplate()]})
+		]
+	})
   ]
 }});
 
