@@ -101,7 +101,7 @@ var setTempCon = new Container({left:20,right:20,top:0, height: 50,contents: [se
 var schedulesTemplate = BUTTONS.Button.template(function($){ return{
 		top: gap,left:20, right:20, height: 60,skin:clearS,top:0,
 	contents:[
-		schedBg, new Label({height:10, string:$.textForLabel,style:whiteStyle}), 
+		schedBg, new Label({height:10, string:"Schedules >",style:whiteStyle}), 
 	],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
@@ -115,7 +115,7 @@ var schedulesTemplate = BUTTONS.Button.template(function($){ return{
 	})
 }});
 var schedBg = new Picture({height:50, url:"buttons/settemp.png"})
-var schedulesButton = new schedulesTemplate({bottom:0,textForLabel:"Schedules >"});
+var schedulesButton = new schedulesTemplate({bottom:0,textForLabel:"Schedules ❯"});
 
 
 /****** Timer/Camera Container *****/

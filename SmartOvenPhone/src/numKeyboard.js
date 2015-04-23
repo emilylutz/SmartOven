@@ -69,12 +69,7 @@ Handler.bind("/moveKey", {
     if (keyBottom < 0) {
    		keyBottom += 10
    		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
-   		trace(keyBottom+ "\n")
-	 	handler.invoke( new Message("/delayKey")); }
-	 else {
-	 	trace("hayyall");
-	 	//keyBottom = -100
-	 	}}
+	 	handler.invoke( new Message("/delayKey")); }}
 	    
 });
 Handler.bind("/delayKey", {
@@ -89,7 +84,6 @@ Handler.bind("/hideNumKey", {
     onInvoke: function(handler, message){
 	if (keyBottom > -250) {
 		keyBottom -= 10
-		trace(keyBottom+"\n")
 		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
 		handler.invoke(new Message("/delayKeyHide"));
 		}

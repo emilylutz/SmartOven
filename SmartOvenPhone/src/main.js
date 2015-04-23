@@ -41,6 +41,13 @@ Handler.bind("/toAddSched", Behavior({
 	},
 }));
 
+/* Transition from addSchedScreen (add new schedule page) to schedScreen (schedules page) */
+Handler.bind("/backToSchedMain", Behavior({
+	onInvoke: function(handler, message){
+		mainScreen.run( new TRANSITIONS.Push(), addSchedScreen,schedMainScreen, { direction : "right", duration : 300 } );
+	},
+}));
+
 Handler.bind("/addToSaved", Behavior({
 	onInvoke: function(handler, message){
 		mainScreen.run( new TRANSITIONS.Push(), addSchedScreen, savedSched, { direction : "left", duration : 300 } );

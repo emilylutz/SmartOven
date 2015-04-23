@@ -13,6 +13,8 @@ var menuStyle = new Style({ font:"15px Heiti SC", color:"black", horizontal:"cen
 var titleStyle = new Style({ font:"28px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
 var fieldStyle = new Style({ color: 'black', font: '15px Heiti SC', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
 var fieldHintStyle = new Style({ color: '#aaa', font: "15px Heiti SC", horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
+var backStyle = new Style({ font:"20px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
+var touchBackStyle = new Style({ font:"20px Heiti SC", color:"#545e5d", horizontal:"center", vertical:"top" });
 
 /*SKINS*/
 var menuBackgroundSkin = new Skin({ fill: "#00FFFF" } );
@@ -294,7 +296,16 @@ var subContainer = new Column({top:0, left:0, right:0, skin:whiteSkin, active:tr
 	}),
 	contents:[
 		new Container({height: 60, left:0, right:0, skin:greenS, top:0,
-			contents: [ new Label({left:15, string: "Set schedule:", style: titleStyle}) ]
+			contents: [ new Label({ left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
+				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+					onTap: { value:  function(button) {
+						application.invoke(new Message("/backToSchedMain"));
+						button.style= backStyle
+						}},
+					onTouchBegan: { value: function(button) {
+							button.style = touchBackStyle
+							}}
+					})}), new Label({left:80,string: "Set Schedule", style: titleStyle}) ]
 		}),
 		nameContainer,
 		mainFieldContainer,

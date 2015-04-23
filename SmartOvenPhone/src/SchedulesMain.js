@@ -20,7 +20,7 @@ var turkeyContainer = new Line({top:0, left:0, right:0, height:80, skin:whiteSki
 exports.mainContainer = new Column.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, active:true,
 	contents:[
 		new Line({height: 60, left:0, right:0, skin:greenS, top:0,
-			contents: [ new Label({name:"ho", left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
+			contents: [ new Label({ left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
 				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 					onTap: { value:  function(button) {
 						application.invoke(new Message("/backToMain"));
