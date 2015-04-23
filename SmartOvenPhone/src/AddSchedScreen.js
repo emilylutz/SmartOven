@@ -48,7 +48,20 @@ var nameField = Container.template(function($) { return {
          			var data = this.data;
               data.name = label.string;
               label.container.hint.visible = ( data.name.length == 0 );	
-         		}}
+         		}},
+            onKeyDown: { value:  function(label, key, repeat, ticks) {
+                    if (key) {
+                        var code = key.charCodeAt(0);
+                        if (code == 3 /* enter */ || code == 13 /* return */) {
+                            KEYBOARD.hide();
+                            subContainer.focus()
+							
+                        } else {
+                            CONTROL.FieldLabelBehavior.prototype.onKeyDown.call(this, label, key, repeat, ticks);
+                        }
+                    }
+                }   
+            }
          	}),
          }),
          Label($, {
@@ -218,12 +231,6 @@ var timeContainer = new Line({left:0, top:5, bottom:10, contents:[timeLabel, hou
 var stepLabel = new Label({top:10, left:0, string:"Step 1", style:labelStyle});
 var fieldContainerTemplate = Container.template(function($) { return {
 	name:"fieldContainer", top:10,skin: greenBorderS, active: true,
-	behavior: Behavior({
-		onTouchEnded: function(content){
-			KEYBOARD.hide();
-			content.focus();
-		}
-	}),
 	contents: [
 		new Column({left:15, top:0, right:15, width: 270, contents:[stepLabel,tempActionContainer,timeContainer]})
 	]
@@ -272,7 +279,7 @@ var doneButton = new doneButtonTemplate();
 var doneButtonContainerTemplate = Container.template(function($) { return {
 	top:10, left:10, bottom: 20, contents:[doneButton]
 }});
-var mainFieldContainer = new Column({name:"subCol", contents:[fieldContainer, instructionContainer]});
+var mainFieldContainer = new Column({name:"subCol", contents:[fieldContainer, instructionContainer], active:true});
 
 var scroller = SCROLLER.VerticalScroller.template(function($){ return{
 	contents:$.contents

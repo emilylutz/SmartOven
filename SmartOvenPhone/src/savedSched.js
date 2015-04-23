@@ -7,7 +7,7 @@ var plusStyle = new Style({ font:"40px Heiti SC", color:"White", horizontal:"cen
 var nextStyle = new Style({ font:"30px Heiti SC", color:"gray", horizontal:"center", vertical:"top" });
 var whiteLabelStyle = new Style({ font:"16px Heiti SC", color:"white", horizontal:"center", vertical:"middle" });
 
-var greenS = new Skin({fill:"#67BFA0"});
+var greenS = new Skin({fill:"#6ebab5"});
 var greyS = new Skin({fill:"gray"});
 var whiteSkin = new Skin({fill:"white"});
 
@@ -16,7 +16,7 @@ var info1 = "Step 1: Bake at 300 °F";
 info1Label = new Label({top:5, left:0, bottom:0, height:20, string:info1, style: labelStyle});
 var info2 = "for 0 hours and 45 minutes";
 info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
-var addLabelColumn = new Column({left:0, right:0,contents: [info1Label, info2Label]});
+var addLabelColumn = new Column({left:0, right:0,contents: [info1Label,info2]});
 var addLabelContainer = new Line({top:0, left:15, right:0, height:80, skin:whiteSkin, contents:[addLabelColumn]});
 
 /* step 2 */
@@ -62,7 +62,6 @@ exports.mainContainer = new Column.template(function($) { return {top:0, left:0,
 		}),
 		addLabelContainer,
 		new Container({height:1, skin:greenS, left:10, right:10}),
-		addLabelContainer1,
 		new startButtonContainerTemplate()
 	]
 }});

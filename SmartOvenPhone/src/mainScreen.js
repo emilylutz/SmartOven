@@ -8,7 +8,7 @@ var gap = 10;
 
 /** SKINS **/
 var whiteSkin = new Skin({fill:"white"});
-var greenS = new Skin({fill:"#67BFA0"});
+var greenS = new Skin({fill:"#6ebab5"});
 var clearS = new Skin({fill:""});
 var darkGreyS = new Skin({fill:"#8A8A8A"});
 var greyS = new Skin({fill:"#CCCCCC"});
@@ -482,7 +482,7 @@ exports.mainColumn = new Column.template(function($) { return ({
 
 Handler.bind("/hardcodedInstruction", {
     onInvoke: function(handler, message){
-       	setTempVal.string = "325";
+       	setTempVal.string = "300";
 		application.invoke(new Message("/setTemp"));
         }
 });

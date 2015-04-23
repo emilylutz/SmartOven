@@ -2,7 +2,8 @@
 /****** Key Button templates *****/
 
 /* SKINS */
-var greenS = new Skin({fill:"#67BFA0"});
+var greenS = new Skin({fill:"#6ebab5"});
+var greenTouchS = new Skin({fill:"#7d9694"});
 var keySkin = new Skin({fill:"#fcfdfd",borders:{left:0,right:0,top:0,bottom:1},stroke:"#c2c5c8"});
 var darkGreyS = new Skin({fill:"#c2c5c8"});
 var greyS = new Skin({fill:"#fcfdfd"});
@@ -18,7 +19,7 @@ var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
 
 var action = "";
 var editedLabel = ""
-
+var keyBottom = -100;
 var fieldHint1 = ""
 /* Changes the value of "Set Temp:" when you type */
 function newTempVal(value) {
@@ -37,6 +38,7 @@ function newTempVal(value) {
 	}
 	
 var canAdd = 1;
+var firstOpen = 1;
 exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
 		top:$.top,left:$.left, right:$.right, width:$.width,fieldHint:$.fieldHint, label:$.label,max:$.max, action: $.action, height: $.height,skin:$.skin,keyboard:$.keyboard,
 	contents:$.contents,
@@ -48,17 +50,59 @@ exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
 				editedLabel.string = "";
 				}
 			fieldHint1 = $.fieldHint
-			if (canAdd) {				
-				application.add(numKeyboard);
+			if (canAdd) {
+				if (firstOpen) {		
+					application.add(numKeyboard);
+					firstOpen = 0;
+					}
+				button.invoke(new Message("/delayKey"));
 				action = $.action
-				trace(action);
-				application.invoke(new Message(action+"Open"));
+				//application.invoke(new Message(action+"Open"));
 				}
 			canAdd = 0;
 		}},
 	})
 }});
 
+Handler.bind("/moveKey", {
+    onInvoke: function(handler, message){
+    if (keyBottom < 0) {
+   		keyBottom += 10
+   		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
+   		trace(keyBottom+ "\n")
+	 	handler.invoke( new Message("/delayKey")); }
+	 else {
+	 	trace("hayyall");
+	 	//keyBottom = -100
+	 	}}
+	    
+});
+Handler.bind("/delayKey", {
+    onInvoke: function(handler, message){
+        handler.wait(10); //will call onComplete 1000 = 1sec
+    },
+    onComplete: function(handler, message){
+        handler.invoke(new Message("/moveKey"));
+    }
+});
+Handler.bind("/hideNumKey", {
+    onInvoke: function(handler, message){
+	if (keyBottom > -250) {
+		keyBottom -= 10
+		trace(keyBottom+"\n")
+		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
+		handler.invoke(new Message("/delayKeyHide"));
+		}
+	    
+}});
+Handler.bind("/delayKeyHide", {
+    onInvoke: function(handler, message){
+        handler.wait(10); //will call onComplete 1000 = 1sec
+    },
+    onComplete: function(handler, message){
+        handler.invoke(new Message("/hideNumKey"));
+    }
+});
 
 
 
@@ -93,6 +137,7 @@ var delKeyTemplate = BUTTONS.Button.template(function($){ return{
 	})
 }});
 
+
 // enter key
 
 var enterKeyTemplate = BUTTONS.Button.template(function($){ return{
@@ -101,7 +146,7 @@ var enterKeyTemplate = BUTTONS.Button.template(function($){ return{
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
 			button.skin = greenS;
-			application.remove(numKeyboard);
+			button.invoke(new Message("/hideNumKey"));
 			canAdd = 1;
 			if (editedLabel.string.length == 0) {
 				editedLabel.string = fieldHint1
@@ -109,7 +154,7 @@ var enterKeyTemplate = BUTTONS.Button.template(function($){ return{
 			application.invoke(new Message(action));
 		}},
 		onTouchBegan: { value:  function(button){
-			button.skin = greyS
+			button.skin = greenTouchS
 			
 		}}
 	})
@@ -155,4 +200,4 @@ var thirdRow = new Container({left:0, right:0, top:0,height: keyHeight,skin: gre
 var fourthRow = new Container({left:0, right:0, top:0,height: keyHeight,skin:darkGreyS, contents: [zeroButton,delButton,blank,zero,del]})
 
 /*The keyboard */
-var numKeyboard = new Column( {right:0,left:0, bottom:0,contents: [enterKey, firstRow,secondRow,thirdRow,fourthRow]});
+var numKeyboard = new Column( {right:0,left:0, bottom:keyBottom,contents: [enterKey, firstRow,secondRow,thirdRow,fourthRow]});

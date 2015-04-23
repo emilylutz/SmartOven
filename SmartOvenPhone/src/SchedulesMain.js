@@ -5,7 +5,7 @@ var backStyle = new Style({ font:"20px Heiti SC", color:"White", horizontal:"cen
 var plusStyle = new Style({ font:"40px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
 var nextStyle = new Style({ font:"30px Heiti SC", color:"gray", horizontal:"center", vertical:"top" });
 
-var greenS = new Skin({fill:"#67BFA0"});
+var greenS = new Skin({fill:"#6ebab5"});
 var whiteSkin = new Skin({fill:"white"});
 
 var quicheLabel = new Label({left:15, style:labelStyle, string: "Quiche"});
