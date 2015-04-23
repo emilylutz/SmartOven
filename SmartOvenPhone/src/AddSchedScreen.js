@@ -33,6 +33,14 @@ info.temperature = 0;
 info.hour = 0;
 info.minutes = 0;
 info.menu = false;
+Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
+//@line 27
+	onInvoke: { value: function( handler, message ){
+			trace("HEY");
+			message.responseText = JSON.stringify({action: info.action, temp: info.temperature, min: info.minutes, hour: info.hour});
+			message.status = 200;
+			}}
+}));
 
 var step = 1;
 
@@ -272,7 +280,9 @@ var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
 						doneMessage = new Label({top:20, string:"Your schedule has been saved!", style: labelStyle});
                 		subContainer.add(doneMessage);
 					}
+					application.invoke(new Message("/receiveNewSchedInfo"));
 					application.invoke(new Message("/addToSaved"));
+					
 				}}
         })
 }});
@@ -312,6 +322,7 @@ var subContainer = new Column({top:0, left:0, right:0, skin:whiteSkin, active:tr
 		new Container({top:20, contents: [new doneButtonContainerTemplate()]}),
 	]
 });
+
 
 var mainScroller = new scroller({skin:whiteSkin, contents:[subContainer]});
 exports.mainContainer = new Container.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, 

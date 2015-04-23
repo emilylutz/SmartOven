@@ -19,7 +19,7 @@ var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
 
 var action = "";
 var editedLabel = ""
-var keyBottom = -100;
+var keyBottom = -150;
 var fieldHint1 = ""
 /* Changes the value of "Set Temp:" when you type */
 function newTempVal(value) {
@@ -57,35 +57,37 @@ exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
 					}
 				button.invoke(new Message("/delayKey"));
 				action = $.action
-				//application.invoke(new Message(action+"Open"));
+				application.invoke(new Message(action+"Open"));
 				}
 			canAdd = 0;
 		}},
 	})
 }});
-
 Handler.bind("/moveKey", {
     onInvoke: function(handler, message){
+    //trace(application.contents)
+    //application.coordinates = {left:0,right:0,bottom:20}
     if (keyBottom < 0) {
-   		keyBottom += 10
+   		keyBottom += 5
    		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
 	 	handler.invoke( new Message("/delayKey")); }}
 	    
 });
 Handler.bind("/delayKey", {
     onInvoke: function(handler, message){
-        handler.wait(10); //will call onComplete 1000 = 1sec
+        handler.wait(5); //will call onComplete 1000 = 1sec
     },
     onComplete: function(handler, message){
-        handler.invoke(new Message("/moveKey"));
+        handler.invoke(new Message("/moveKey"));;
     }
 });
 Handler.bind("/hideNumKey", {
     onInvoke: function(handler, message){
 	if (keyBottom > -250) {
-		keyBottom -= 10
+		keyBottom -= 5
 		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
 		handler.invoke(new Message("/delayKeyHide"));
+		
 		}
 	    
 }});

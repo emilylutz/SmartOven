@@ -55,10 +55,15 @@ Handler.bind("/addToSaved", Behavior({
 }));
 Handler.bind("/setTimerOpen", Behavior({
 	onInvoke: function(handler, message){
-		statusScreen.coordinates = {right:0, left:0, bottom:150};
+		handler.invoke(new Message("/openNumKey"));
 	},
 }));
 
+Handler.bind("/setTimer", Behavior({
+	onInvoke: function(handler, message){
+		handler.invoke(new Message("/closeNumKey"));
+	},
+}));
 Handler.bind("/addSchedOpen", Behavior({
 	onInvoke: function(handler, message){
 		addSchedScreen.coordinates = {right:0, left:0, bottom:150};
@@ -67,15 +72,47 @@ Handler.bind("/addSchedOpen", Behavior({
 
 Handler.bind("/addSched", Behavior({
 	onInvoke: function(handler, message){
-		addSchedScreen.coordinates = {right:0, left:0, top:0, bottom:0};
+		addSchedScreen.coordinates = {right:0, left:0, bottom:0,top:0};
 	},
 }));
-
-Handler.bind("/setTimer", Behavior({
+screenBot = 0;
+Handler.bind("/openNumKey", Behavior({
 	onInvoke: function(handler, message){
-		statusScreen.coordinates = {right:0, left:0, bottom:0,top:0};
+		if (screenBot < 150) {
+			screenBot += 5;
+			mainScreen.coordinates = {right:0, left:0, bottom:screenBot};
+			application.invoke(new Message("/delayOpenKey"));}
 	},
 }));
+Handler.bind("/delayOpenKey", {
+    onInvoke: function(handler, message){
+        handler.wait(5); //will call onComplete 1000 = 1sec
+    },
+    onComplete: function(handler, message){
+        handler.invoke(new Message("/openNumKey"));;
+    }
+});
+
+Handler.bind("/closeNumKey", Behavior({
+	onInvoke: function(handler, message){
+		if (screenBot > 0) {
+			screenBot -= 5;
+			mainScreen.coordinates = {right:0, left:0, bottom:screenBot};
+			application.invoke(new Message("/delayKeyClose"));}
+		else {
+			mainScreen.coordinates = {right:0,left:0,bottom:0,top:0}
+			}
+	},
+}));
+Handler.bind("/delayKeyClose", {
+    onInvoke: function(handler, message){
+        handler.wait(10); //will call onComplete 1000 = 1sec
+    },
+    onComplete: function(handler, message){
+    	handler.invoke(new Message("/closeNumKey"));
+    }
+});
+
 
 var mainScreen = new MainScreen();
 
