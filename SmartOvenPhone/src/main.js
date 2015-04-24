@@ -9,6 +9,9 @@ var MainS = require("mainScreen.js")
 var SchedMainS = require("schedulesMain.js")
 var AddSchedS = require("AddSchedScreen.js")
 var SavedSchedS = require("savedSched.js")
+var StartSchedS = require("startSched.js")
+
+
 var whiteSkin = new Skin({ fill: 'white',});
 
 /* Main container for application - will hold all screens and handle transitions*/
@@ -48,11 +51,25 @@ Handler.bind("/backToSchedMain", Behavior({
 	},
 }));
 
+/* Transition from addSchedScreen (add new schedule page) to schedScreen (schedules page) */
+Handler.bind("/startToSchedMain", Behavior({
+	onInvoke: function(handler, message){
+		mainScreen.run( new TRANSITIONS.Push(),startSched ,schedMainScreen, { direction : "right", duration : 300 } );
+	},
+}));
+
 Handler.bind("/addToSaved", Behavior({
 	onInvoke: function(handler, message){
 		mainScreen.run( new TRANSITIONS.Push(), addSchedScreen, savedSched, { direction : "left", duration : 300 } );
 	},
 }));
+
+Handler.bind("/schedMainToStart", Behavior({
+	onInvoke: function(handler, message){
+		mainScreen.run( new TRANSITIONS.Push(), schedMainScreen, startSched, { direction : "left", duration : 300 } );
+	},
+}));
+
 Handler.bind("/setTimerOpen", Behavior({
 	onInvoke: function(handler, message){
 		handler.invoke(new Message("/openNumKey"));
@@ -75,6 +92,7 @@ Handler.bind("/addSched", Behavior({
 		addSchedScreen.coordinates = {right:0, left:0, bottom:0,top:0};
 	},
 }));
+
 screenBot = 0;
 Handler.bind("/openNumKey", Behavior({
 	onInvoke: function(handler, message){
@@ -122,6 +140,7 @@ var statusScreen = new MainS.mainColumn();
 var schedMainScreen = new SchedMainS.mainContainer();
 var addSchedScreen = new AddSchedS.mainContainer();
 var savedSched = new SavedSchedS.mainContainer();
+var startSched = new StartSchedS.mainContainer();
 var ApplicationBehavior = Behavior.template({
 	onLaunch: function(application) {
 		application.shared = true;

@@ -36,8 +36,7 @@ info.menu = false;
 Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
 //@line 27
 	onInvoke: { value: function( handler, message ){
-			trace("HEY");
-			message.responseText = JSON.stringify({action: info.action, temp: info.temperature, min: info.minutes, hour: info.hour});
+			message.responseText = JSON.stringify({step1:info1,temperature:info.temperature});
 			message.status = 200;
 			}}
 }));
@@ -191,6 +190,7 @@ function allFieldsFilled() {
 };
 var errorMessage = new Label({top:10, string:"**Please fill in all of the fields before adding a step.", style:errorStyle});
 var hasError = false;
+var info1 = ""
 var addButtonTemplate = BUTTONS.Button.template(function($){ return{
 		height: 35, width: 90, skin:greenS,
         contents: [
@@ -207,7 +207,7 @@ var addButtonTemplate = BUTTONS.Button.template(function($){ return{
 							mainFieldContainer.remove(errorMessage);
 						}
 						updateInfo();
-                    	var info1 = "Step " + step + ": " + info.action + " at " + info.temperature + "°F";
+                    	info1 = "Step " + step + ": " + info.action + " at " + info.temperature + "°F";
                     	info1Label = new Label({top:5, left:0, bottom:0, height:20, string:info1, style: labelStyle});
                     	var info2 = "for " + info.hour + " hours and " + info.minutes + " minutes";
                     	info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
@@ -280,6 +280,7 @@ var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
 						doneMessage = new Label({top:20, string:"Your schedule has been saved!", style: labelStyle});
                 		subContainer.add(doneMessage);
 					}
+					trace("HI");
 					application.invoke(new Message("/receiveNewSchedInfo"));
 					application.invoke(new Message("/addToSaved"));
 					
