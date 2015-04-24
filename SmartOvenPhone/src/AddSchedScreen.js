@@ -26,6 +26,7 @@ var greenS = new Skin({fill:"#67BFA0"});
 var greenBorderS = new Skin({borders: { left:1, right:1, top:1, bottom:1 }, fill: "white", stroke: '#67BFA0', left: 5, right: 5, top: 5, bottom: 5});
 var greyS = new Skin({fill:"gray"});
 var keyboardButtonStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
+var doneMessage = ""
 
 var info = new Object();
 info.action = 'Bake';
@@ -33,10 +34,14 @@ info.temperature = 0;
 info.hour = 0;
 info.minutes = 0;
 info.menu = false;
+finalSchedName = ""
+var schedSteps = new Object();
+schedSteps.steps = [];
+schedSteps.size = 0;
 Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
 //@line 27
 	onInvoke: { value: function( handler, message ){
-			message.responseText = JSON.stringify({step1:info1,temperature:info.temperature});
+			message.responseText = JSON.stringify({steps:schedSteps,name:finalSchedName,temperature:info.temperature,hrs: info.hour, min: info.minutes});
 			message.status = 200;
 			}}
 }));
@@ -56,6 +61,7 @@ var nameField = Container.template(function($) { return {
          		onEdited: { value: function(label){
          			var data = this.data;
               data.name = label.string;
+              finalSchedName = data.name
               label.container.hint.visible = ( data.name.length == 0 );	
          		}},
             onKeyDown: { value:  function(label, key, repeat, ticks) {
@@ -221,6 +227,10 @@ var addButtonTemplate = BUTTONS.Button.template(function($){ return{
                     	var info2 = "for " + info.hour + " hours and " + info.minutes + " minutes";
                     	info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
                     	addLabelContainer = new Column({left:0, right:0,contents: [info1Label, info2Label]});
+                    	schedSteps.steps[schedSteps.size] = info1;
+                    	schedSteps.size += 1;
+                    	schedSteps.steps[schedSteps.size] = info2;
+                    	schedSteps.size += 1;
                     	instructionContainer.col.add(addLabelContainer);
                     	mainFieldContainer.remove(fieldContainer);
                     	step++;
@@ -336,6 +346,31 @@ var subContainer = new Column({top:0, left:0, right:0, skin:whiteSkin, active:tr
 		new Container({top:20, contents: [new doneButtonContainerTemplate()]}),
 	]
 });
+
+Handler.bind("/cleanAddSched", Object.create(Behavior.prototype, {
+//@line 27
+	onInvoke: { value: function( handler, message ){
+		nameContainer.remove(nField);
+		nField = nameField({name: ""});
+		nameContainer.add(nField);
+		stepLabel.string = "Step 1"
+		subContainer.remove(doneMessage);
+		mainFieldContainer.remove(instructionContainer);
+		instructionContainer = new instructionContainerTemplate();
+		mainFieldContainer.add(instructionContainer);
+		schedSteps = new Object();
+		schedSteps.steps = [];
+		schedSteps.size = 0;
+		step = 1;
+		info = new Object();
+		info.action = 'Bake';
+		info.temperature = 0;
+		info.hour = 0;
+		info.minutes = 0;
+		info.menu = false;
+		//AddNeedClean = 0;
+			}}
+}));
 
 
 var mainScroller = new scroller({skin:whiteSkin, contents:[subContainer]});

@@ -351,15 +351,17 @@ var offButtonPresent = 0;
 // currTempVal.string is the current temperature string (to be updated)
 Handler.bind("/setTemp", Behavior({
 		onInvoke: function(handler, message) {
-		var msg = new Message(deviceURL + "setGoalTemp");
-		var goalTemp = parseInt(setTempVal.string);	
-		msg.requestText = goalTemp;
-		if (offButtonPresent == 0) {
-			statusCon.add(offBg);
-			statusCon.add(offButton);
-			offButtonPresent = 1;
+		if (setTempVal.string != "") {
+			var msg = new Message(deviceURL + "setGoalTemp");
+			var goalTemp = parseInt(setTempVal.string);	
+			msg.requestText = goalTemp;
+			if (offButtonPresent == 0) {
+				statusCon.add(offBg);
+				statusCon.add(offButton);
+				offButtonPresent = 1;
+				}
+			if (deviceURL != "") handler.invoke(msg, Message.JSON);
 			}
-		if (deviceURL != "") handler.invoke(msg, Message.JSON);
 	},
 	onComplete: function(content, message, json) {
 		goalOvenTemp = json.goalTemp;

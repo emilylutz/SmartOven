@@ -37,9 +37,20 @@ Handler.bind("/savedToMain", Behavior({
 	},
 }));	
 
+AddNeedClean = 0;
+SavedNeedClean = 0
 /* Transition from statusScreen (main page) to schedScreen (schedules page) */
 Handler.bind("/toAddSched", Behavior({
 	onInvoke: function(handler, message){
+		if (AddNeedClean) {
+			application.invoke(new Message("/cleanAddSched"));
+			AddNeedClean = 0;
+			}
+		if (SavedNeedClean) {
+			application.invoke(new Message("/cleanSavedSched"));
+			SavedNeedClean = 0;
+			}
+		AddNeedClean = 1;
 		mainScreen.run( new TRANSITIONS.Push(), schedMainScreen, addSchedScreen, { direction : "left", duration : 300 } );
 	},
 }));
@@ -60,6 +71,7 @@ Handler.bind("/startToSchedMain", Behavior({
 
 Handler.bind("/addToSaved", Behavior({
 	onInvoke: function(handler, message){
+		SavedNeedClean = 1;
 		mainScreen.run( new TRANSITIONS.Push(), addSchedScreen, savedSched, { direction : "left", duration : 300 } );
 	},
 }));

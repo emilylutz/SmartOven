@@ -12,17 +12,6 @@ var greenS = new Skin({fill:"#6ebab5"});
 var greyS = new Skin({fill:"gray"});
 var whiteSkin = new Skin({fill:"white"});
 var action = ""
-Handler.bind("/receiveNewSchedInfo", 
-	Behavior({
-	onInvoke: function(handler, message){
-		handler.invoke(new Message("/getNewSchedInfo"), Message.TEXT);		
-	},
-	onComplete: function(handler, message, text){
-		if (text != undefined) {
-			var msg = JSON.parse(text);
-			trace("hello");
-			info1Label.string = "hi";
-			}}}))
 			
 /* step 1 */
 var info1 = "Bake at 450 °F"  

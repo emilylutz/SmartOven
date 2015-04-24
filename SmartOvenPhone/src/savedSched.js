@@ -10,6 +10,7 @@ var greenS = new Skin({fill:"#6ebab5"});
 var greyS = new Skin({fill:"gray"});
 var whiteSkin = new Skin({fill:"white"});
 var action = ""
+var schedNameLabel = new Label({left:40, string: "", style: titleStyle})
 Handler.bind("/receiveNewSchedInfo", 
 	Behavior({
 	onInvoke: function(handler, message){
@@ -18,16 +19,29 @@ Handler.bind("/receiveNewSchedInfo",
 	onComplete: function(handler, message, text){
 		if (text != undefined) {
 			var msg = JSON.parse(text);
-			//step1Label1.string = msg.step1;
-			}}}))
+			sched = msg.steps
+			stepNum = sched.size + 1
+			schedNameLabel.string = msg.name
+			for (i = 0; i < stepNum-1;i++) {
+				info1Labell = new Label({top:5, left:0, bottom:0, height:20, string:sched.steps[i], style: labelStyle});
+                info2Labell = new Label({top:5, left:0, bottom:5, height:20, string: sched.steps[i+1], style: labelStyle});
+                addLabelContainer33 = new Column({left:5,right:0,top:5,contents: [info1Labell, info2Labell,new Container({height:1, skin:greenS, left:10, right:10})]});
+                stepsContainer.add(addLabelContainer33);
+                i += 1
+				}
+			//stepsContainer.skin = greenS
+				}}
+
+			}));
 			
 /* step 1 */
+stepsContainer = new Column({left:0,right:0,top:0,bottom:0,contents: []});
 var info1 = "Step 1: Bake at 325 °F"  
 step1Label1 = new Label({top:5, left:0, bottom:0, string:info1, height:20, style: labelStyle});
 var info2 = "for 2 hours and 0 minutes";
 step1Label2 = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
 var addLabelColumn = new Column({left:0, right:0,contents: [step1Label1,step1Label2]});
-var addLabelContainer = new Line({top:0, left:15, right:0, height:80, skin:whiteSkin, contents:[addLabelColumn]});
+var addLabelContainer = new Line({top:0, left:15, right:0, height:80, skin:whiteSkin, contents:[]});
 /* step 2 */
 var info3 = "Step 2: Broil at 245 °F";
 info3Label = new Label({top:5, left:0, bottom:0, height:20, string:info3, style: labelStyle});
@@ -60,17 +74,21 @@ var startButtonContainerTemplate = Container.template(function($) { return {
 }});
 
 
-
+Handler.bind("/cleanSavedSched", Object.create(Behavior.prototype, {
+//@line 27
+	onInvoke: { value: function( handler, message ){
+			stepsContainer = new Column({left:0,right:0,top:0,bottom:0,contents: []});
+			}}
+}));
 exports.mainContainer = new Column.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, active:true,
 	contents:[
 		new Line({height: 60, left:0, right:0, skin:greenS, top:0,
 			contents: [ 
 				new Label({left:5, string: "❮ Back", style: backStyle}),
-				new Label({left:40, string: "Turkey", style: titleStyle}),
+				schedNameLabel,
 			]
 		}),
-		addLabelContainer,
-		new Container({height:1, skin:greenS, left:10, right:10}),
+		stepsContainer,
 		new startButtonContainerTemplate()
 	]
 }});
