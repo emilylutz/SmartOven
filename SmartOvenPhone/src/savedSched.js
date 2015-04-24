@@ -18,15 +18,15 @@ Handler.bind("/receiveNewSchedInfo",
 	onComplete: function(handler, message, text){
 		if (text != undefined) {
 			var msg = JSON.parse(text);
-			//info1Label.string = msg.step1;
+			//step1Label1.string = msg.step1;
 			}}}))
 			
 /* step 1 */
 var info1 = "Step 1: Bake at 325 °F"  
-info1Label = new Label({top:5, left:0, bottom:0, string:info1, height:20, style: labelStyle});
+step1Label1 = new Label({top:5, left:0, bottom:0, string:info1, height:20, style: labelStyle});
 var info2 = "for 2 hours and 0 minutes";
-info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
-var addLabelColumn = new Column({left:0, right:0,contents: [info1Label,info2Label]});
+step1Label2 = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
+var addLabelColumn = new Column({left:0, right:0,contents: [step1Label1,step1Label2]});
 var addLabelContainer = new Line({top:0, left:15, right:0, height:80, skin:whiteSkin, contents:[addLabelColumn]});
 /* step 2 */
 var info3 = "Step 2: Broil at 245 °F";

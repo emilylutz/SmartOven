@@ -58,10 +58,6 @@ var nameField = Container.template(function($) { return {
               data.name = label.string;
               label.container.hint.visible = ( data.name.length == 0 );	
          		}},
-         		onTouchEnded: {value: function(label) {
-         			KEYBOARD.hide()
-         			subContainer.focus()
-         			}},
             onKeyDown: { value:  function(label, key, repeat, ticks) {
                     if (key) {
                         var code = key.charCodeAt(0);
@@ -78,7 +74,13 @@ var nameField = Container.template(function($) { return {
          	}),
          }),
          Label($, {
-   			 	left:4, right:4, top:4, bottom:4, style:fieldHintStyle, string:"Recipe name", name:"hint"
+   			 	left:4, right:4, top:4, bottom:4, style:fieldHintStyle, string:"Recipe name", name:"hint",
+   			behavior: Object.create( CONTROL.FieldLabelBehavior.prototype, {
+         		onTouchEnded: {value: function(label) {
+         			KEYBOARD.hide()
+         			subContainer.focus()
+         			
+         		}}})
          }),
       ]
     })
@@ -91,6 +93,9 @@ var actionField = Container.template(function($) { return {
           skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
           string: $.name, active:true, name: "lbl",
          	behavior: Object.create(Behavior.prototype, {
+         		onTouchBegan: {value: function(label) {
+         			KEYBOARD.hide()
+         			subContainer.focus()}},
          		onTouchEnded: { value: function(container, id, x,  y, ticks) {
 	        	    if (info.menu == false) {
 	        	    	actionContainer.add(dropDownMenu);
@@ -245,6 +250,11 @@ var timeContainer = new Line({left:0, top:5, bottom:10, contents:[timeLabel, hou
 var stepLabel = new Label({top:10, left:0, string:"Step 1", style:labelStyle});
 var fieldContainerTemplate = Container.template(function($) { return {
 	name:"fieldContainer", top:10,skin: greenBorderS, active: true,
+	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+					onTouchBegan: { value:  function(button) {
+						KEYBOARD.hide()
+						subContainer.focus()
+						}}}),
 	contents: [
 		new Column({left:15, top:0, right:15, width: 270, contents:[stepLabel,tempActionContainer,timeContainer]})
 	]
