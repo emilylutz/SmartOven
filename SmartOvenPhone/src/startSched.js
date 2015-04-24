@@ -20,6 +20,8 @@ Handler.bind("/receiveNewSchedInfo",
 	onComplete: function(handler, message, text){
 		if (text != undefined) {
 			var msg = JSON.parse(text);
+			trace("hello");
+			info1Label.string = "hi";
 			}}}))
 			
 /* step 1 */

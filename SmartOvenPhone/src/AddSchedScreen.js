@@ -58,6 +58,10 @@ var nameField = Container.template(function($) { return {
               data.name = label.string;
               label.container.hint.visible = ( data.name.length == 0 );	
          		}},
+         		onTouchEnded: {value: function(label) {
+         			KEYBOARD.hide()
+         			subContainer.focus()
+         			}},
             onKeyDown: { value:  function(label, key, repeat, ticks) {
                     if (key) {
                         var code = key.charCodeAt(0);

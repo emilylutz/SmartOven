@@ -55,6 +55,7 @@ exports.openKeyboardTemplate = BUTTONS.Button.template(function($){ return{
 					application.add(numKeyboard);
 					firstOpen = 0;
 					}
+				outsideKey.active = true;
 				button.invoke(new Message("/delayKey"));
 				action = $.action
 				application.invoke(new Message(action+"Open"));
@@ -68,7 +69,7 @@ Handler.bind("/moveKey", {
     //trace(application.contents)
     //application.coordinates = {left:0,right:0,bottom:20}
     if (keyBottom < 0) {
-   		keyBottom += 5
+   		keyBottom += 10
    		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
 	 	handler.invoke( new Message("/delayKey")); }}
 	    
@@ -84,7 +85,7 @@ Handler.bind("/delayKey", {
 Handler.bind("/hideNumKey", {
     onInvoke: function(handler, message){
 	if (keyBottom > -250) {
-		keyBottom -= 5
+		keyBottom -= 10
 		numKeyboard.coordinates = {left:0,right:0,bottom:keyBottom}
 		handler.invoke(new Message("/delayKeyHide"));
 		
@@ -194,6 +195,17 @@ var firstRow = new Container({left:0, right:0, top:0,height: keyHeight,skin: bor
 var secondRow = new Container({left:0, right:0, top:0,height: keyHeight,skin: greyS, contents: [fourButton,fiveButton,sixButton,four,five,six]})
 var thirdRow = new Container({left:0, right:0, top:0,height: keyHeight,skin: greySBordered, contents: [sevenButton,eightButton,nineButton,seven,eight,nine]})
 var fourthRow = new Container({left:0, right:0, top:0,height: keyHeight,skin:darkGreyS, contents: [zeroButton,delButton,blank,zero,del]})
-
+var outsideKey = new Container({left:0,right:0,top:0,height:250, active:true,
+	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+				onTouchBegan: { value:  function(button){
+				button.invoke(new Message("/hideNumKey"));
+				canAdd = 1;
+				if (editedLabel.string.length == 0) {
+					editedLabel.string = fieldHint1
+				}
+				application.invoke(new Message(action));
+				button.active = false;
+					}}}) });
 /*The keyboard */
-var numKeyboard = new Column( {right:0,left:0, bottom:keyBottom,contents: [enterKey, firstRow,secondRow,thirdRow,fourthRow]});
+var numKeyboard = new Column( {right:0,left:0, bottom:keyBottom, contents: [outsideKey,enterKey, firstRow,secondRow,thirdRow,fourthRow]}) 
+
