@@ -482,7 +482,8 @@ exports.mainColumn = new Column.template(function($) { return ({
 
 Handler.bind("/hardcodedInstruction", {
     onInvoke: function(handler, message){
-       	setTempVal.string = "300";
+       	setTempVal.string = "325";
 		application.invoke(new Message("/setTemp"));
+		hourVal.string = "02"
         }
 });

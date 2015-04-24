@@ -280,7 +280,6 @@ var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
 						doneMessage = new Label({top:20, string:"Your schedule has been saved!", style: labelStyle});
                 		subContainer.add(doneMessage);
 					}
-					trace("HI");
 					application.invoke(new Message("/receiveNewSchedInfo"));
 					application.invoke(new Message("/addToSaved"));
 					
