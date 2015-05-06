@@ -6,12 +6,12 @@ var SCROLLER = require('mobile/scroller');
 var NUMKEYBOARD = require("numKeyboard.js");
 
 /*STYLES*/
-var labelStyle = new Style({ font:"16px Heiti SC", color:"black", horizontal:"center", vertical:"middle" });
+var labelStyle = new Style({ font:"bold 16px Heiti SC", color:"#4d4d4d", horizontal:"center", vertical:"middle" });
 var errorStyle = new Style({ font:"11px Heiti SC", color:"red", horizontal:"center", vertical:"middle" });
 var whiteLabelStyle = new Style({ font:"16px Heiti SC", color:"white", horizontal:"center", vertical:"middle" });
-var menuStyle = new Style({ font:"15px Heiti SC", color:"black", horizontal:"center", vertical:"top" });
-var titleStyle = new Style({ font:"28px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
-var fieldStyle = new Style({ color: 'black', font: '15px Heiti SC', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
+var menuStyle = new Style({ font:"15px Heiti SC", color:"white", horizontal:"center", vertical:"top" });
+var titleStyle = new Style({ font:"bold 24px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
+var fieldStyle = new Style({ color: '#4d4d4d', font: '15px Heiti SC', horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
 var fieldHintStyle = new Style({ color: '#aaa', font: "15px Heiti SC", horizontal: 'left', vertical: 'middle', left: 5, right: 5, top: 5, bottom: 5, });
 var backStyle = new Style({ font:"20px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
 var touchBackStyle = new Style({ font:"20px Heiti SC", color:"#545e5d", horizontal:"center", vertical:"top" });
@@ -22,9 +22,10 @@ var menuButtonSkin = new Skin({fill: "#CCCCCC" });
 var dropDownSkin = new Skin({borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray'});
 var nameInputSkin = new Skin({ borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray', left: 5, right: 5, top: 5, bottom: 5});
 var whiteSkin = new Skin({fill:"white"});
-var greenS = new Skin({fill:"#67BFA0"});
-var greenBorderS = new Skin({borders: { left:1, right:1, top:1, bottom:1 }, fill: "white", stroke: '#67BFA0', left: 5, right: 5, top: 5, bottom: 5});
+var greenS = new Skin({fill:"#6ebab5"});
+var greenBorderS = new Skin({borders: { left:1, right:1, top:1, bottom:1 }, fill: "white", stroke: '#6ebab5', left: 5, right: 5, top: 5, bottom: 5});
 var greyS = new Skin({fill:"gray"});
+var buttonPressedS = new Skin({fill:"7d9694"});
 var keyboardButtonStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
 var doneMessage = ""
 
@@ -48,9 +49,10 @@ Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
 
 var step = 1;
 
-/******** Input name field ******/        
+/******** Input name field ******/
+var nameFieldBG = new Picture({top:0, url:"buttons/schedule_inputField.png"});      
 var nameField = Container.template(function($) { return { 
-  width: 220, height:29, skin: nameInputSkin, contents: [
+  width: 220, height:29, contents: [
     Scroller($, { 
       left: 4, right: 4, top: 4, bottom: 4, active: true, name:"scroller", 
       behavior: Object.create(CONTROL.FieldScrollerBehavior.prototype), clip: true, contents: [
@@ -80,23 +82,24 @@ var nameField = Container.template(function($) { return {
          	}),
          }),
          Label($, {
-   			 	left:4, right:4, top:4, bottom:4, style:fieldHintStyle, string:"Recipe name", name:"hint",
+   			 	left:4, right:4, top:4, bottom:4, style:fieldHintStyle, string:"Schedule name", name:"hint",
    			behavior: Object.create( CONTROL.FieldLabelBehavior.prototype, {
          		onTouchEnded: {value: function(label) {
          			KEYBOARD.hide()
          			subContainer.focus()
          			
          		}}})
-         }),
+         })
       ]
     })
   ]
 }});
 
+/******** Drop down action field ******/
 var actionField = Container.template(function($) { return { 
-  top:0, width: 100, skin: nameInputSkin, active:true, contents: [
+  top:0, width: 113, active:true, contents: [
         Label($, { 
-          skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME',
+          skin: THEME.fieldLabelSkin, style: fieldStyle, anchor: 'NAME', left:16, width:113, 
           string: $.name, active:true, name: "lbl",
          	behavior: Object.create(Behavior.prototype, {
          		onTouchBegan: {value: function(label) {
@@ -105,7 +108,12 @@ var actionField = Container.template(function($) { return {
          		onTouchEnded: { value: function(container, id, x,  y, ticks) {
 	        	    if (info.menu == false) {
 	        	    	actionContainer.add(dropDownMenu);
+	        	    	aFieldArrow.url = "buttons/schedule_uparrow.png";
 	        	    	info.menu = true;
+	        	    } else {
+	        	    	actionContainer.remove(dropDownMenu);
+	        	    	aFieldArrow.url = "buttons/schedule_downarrow.png";
+	        	    	info.menu = false;
 	        	    }
 	        	}}
          	}),
@@ -114,7 +122,7 @@ var actionField = Container.template(function($) { return {
 }});
 
 var DropDownMenu = Container.template(function($) { return {
-	width: 100, top:0, skin: dropDownSkin, active: true,
+	width: 100, top:8, active: true,
 	contents: [
 	           Column($, {left: 5, right: 5, top: 5, bottom: 5, 
 	        	   contents: [
@@ -122,6 +130,7 @@ var DropDownMenu = Container.template(function($) { return {
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {
 				        	    	   actionContainer.remove(dropDownMenu);
+				        	    	   aFieldArrow.url = "buttons/schedule_downarrow.png";
 				        	    	   aField.lbl.string = "Bake";
 				        	    	   info.action = "Bake";
 			        				   info.menu = false;
@@ -132,6 +141,7 @@ var DropDownMenu = Container.template(function($) { return {
 			        	    behavior: Object.create(Behavior.prototype, {
 			        	    	onTouchEnded: { value: function(container, id, x,  y, ticks) {		        			   	   
 			        			   	   actionContainer.remove(dropDownMenu);
+			        			   	   aFieldArrow.url = "buttons/schedule_downarrow.png";
 			        			   	   aField.lbl.string = "Broil";
 			        			   	   info.action = "Broil";
 			        			   	   info.menu = false;
@@ -146,39 +156,52 @@ var DropDownMenu = Container.template(function($) { return {
 
 /* name */
 var nField = new nameField({name: ""});
-var nameContainer = new Line({left:10, top:15, contents:[nField]});
+var nameContainer = new Container({left:10, top:15, contents:[nField, nameFieldBG]});
 
 /* action */
 var aField = new actionField({ name: "Action" });
-var dropDownMenu = new Container({left:0, right:0, top:23, contents:[new DropDownMenu()]});
-var actionContainer = new Container({top:10, height:65, contents:[aField]});
+var aFieldBG = new Picture({top:0, url:"buttons/schedule_actiondropdown.png"});
+var aFieldArrow = new Picture({top:8, left: 94, url:"buttons/schedule_downarrow.png"});
+var dropDownBG = new Picture({top:0, url:"buttons/schedule_dropdown.png"});
+var dropDownMenu = new Container({left:0, right:0, top:28, contents:[dropDownBG, new DropDownMenu()]});
+var actionContainer = new Container({top:10, height:65, contents:[aFieldBG, aField, aFieldArrow]});
 
 /* temperature */
-var temperatureField = new Label({ skin: THEME.fieldLabelSkin, style: fieldStyle, string: "Temperature"});
-var tFieldContainer = new Container({width: 100, skin:nameInputSkin,contents:[temperatureField]});	
-var tempButton = new NUMKEYBOARD.openKeyboardTemplate({top:0,bottom:0,height:23,width:100,skin: greenS, label:temperatureField, max:12, scroller:mainScroller, fieldHint: "Temperature",
+var temperatureField = new Label({top:0, style: fieldStyle, string: "000"});
+var tFieldNameLabel = new Label({style: labelStyle, string:"Temp"});
+var tFieldDegreeLabel = new Label({style: labelStyle, string:"°F"});
+var tFieldBG = new Picture({top:0, url:"buttons/schedule_tinyField.png"});
+var tField = new Container({top:0, left:5, contents:[tFieldBG, temperatureField]});
+var tFieldContainer = new Line({top:0, contents:[tFieldNameLabel, tField, tFieldDegreeLabel]});
+var tempButton = new NUMKEYBOARD.openKeyboardTemplate({top:0,bottom:0,height:23,width:100,label:temperatureField, max:3, scroller:mainScroller, fieldHint: "Temperature",
 	contents:[]});
-var temperatureContainer = new Container({top:10, left:20, skin:greenS, contents:[tempButton, tFieldContainer]});
+var temperatureContainer = new Container({top:10, left:12, contents:[tempButton, tFieldContainer]});
 
-tempActionContainer = new Line({left:0, contents:[actionContainer, temperatureContainer]});
+tempActionContainer = new Line({left:0, top:10, contents:[actionContainer, temperatureContainer]});
 
 /* hour */
-var hourLabel = new Label({ left:0, style: fieldStyle, string: "H"});
-var hourField = new Label({ skin: THEME.fieldLabelSkin, style: fieldStyle, string: "--"});
-var hourFieldContainer = new Container({width: 40, skin:nameInputSkin,contents:[hourField]});	
-var hourButton = new NUMKEYBOARD.openKeyboardTemplate({action:"/addSched",top:0,bottom:0,height:23,width:40,skin: greenS, label:hourField, max:2, scroller:mainScroller, fieldHint: "--",
+var hourLabel = new Label({ left:2, style: fieldStyle, string: "Hours"});
+var hourField = new Label({ style: fieldStyle, string: "00"});
+var hourFieldBG = new Picture({top:0, url:"buttons/schedule_timeField.png"});
+var hourFieldContainer = new Container({contents:[hourFieldBG, hourField]});	
+var hourButton = new NUMKEYBOARD.openKeyboardTemplate({action:"/addSched",top:0,bottom:0,height:23,width:40, label:hourField, max:2, scroller:mainScroller, 
 	contents:[]});
-var hContainer = new Container({left: 20,contents:[hourButton, hourFieldContainer]});
-var hourContainer = new Container({left:0,top:0, right:2, contents:[hourLabel, hContainer]});
+var hContainer = new Container({left: 6,contents:[hourButton, hourFieldContainer]});
+var hourContainer = new Line({left:0,top:0, right:2, contents:[hContainer, hourLabel]});
 
 /* minutes */
-var minuteLabel = new Label({ left:40,style: fieldStyle, string: "M"});
-var minuteField = new Label({ skin: THEME.fieldLabelSkin, style: fieldStyle, string: "--"});
-var minuteFieldContainer = new Container({width: 40, skin:nameInputSkin,contents:[minuteField]});	
-var minuteButton = new NUMKEYBOARD.openKeyboardTemplate({action:"/addSched",top:0,bottom:0,height:23,width:40,skin: greenS, label:minuteField, max:2, scroller:mainScroller, fieldHint: "--",
+var minuteLabel = new Label({ left:0,style: fieldStyle, string: "Minutes"});
+var minuteField = new Label({ style: fieldStyle, string: "00"});
+var minuteFieldBG = new Picture({top:0, url:"buttons/schedule_timeField.png"});
+var minuteFieldContainer = new Container({contents:[minuteFieldBG, minuteField]});	
+var minuteButton = new NUMKEYBOARD.openKeyboardTemplate({action:"/addSched",top:0,bottom:0,height:23,width:40, label:minuteField, max:2, scroller:mainScroller, 
 	contents:[]});
 var minContainer = new Container({left:0, contents:[minuteButton, minuteFieldContainer]});
-var minuteContainer = new Container({top:0, left:2, contents:[minContainer, minuteLabel]});
+var minuteContainer = new Line({top:0, left:0, contents:[minContainer, minuteLabel]});
+
+/* time */
+var timeLabel = new Label({ left:3, style: labelStyle, string: "Time"});
+var timeContainer = new Line({left:0, top:62, bottom:10, contents:[timeLabel, hourContainer, minuteContainer]});
 
 /* addButton */
 function updateInfo() {
@@ -194,44 +217,74 @@ function reinitialize() {
     info.menu = false;
     stepLabel.string = "Step " + step;
     aField.lbl.string = "Action";
-    temperatureField.string = "Temperature";
-    hourField.string = "--";
-    minuteField.string = "--";
+    temperatureField.string = "0";
+    hourField.string = "00";
+    minuteField.string = "00";
 };
-function allFieldsFilled() {
-	if (aField.lbl.string == "Action" | temperatureField.string == "Temperature" | hourField.string == "--" | minuteField.string == "--") {
+function checkError() {
+	if (aField.lbl.string == "Action" | temperatureField.string == "0" | hourField.string > 12 | minuteField.string > 60 | (hourField.string == "00" & minuteField.string == "00")) {
 		return false;
 	} else return true;
 };
-var errorMessage = new Label({top:10, string:"**Please fill in all of the fields before adding a step.", style:errorStyle});
+var errorMessage = new Label({top:10, string:"**Please make sure all fields are filled correctly.**", style:errorStyle});
 var hasError = false;
-var info1 = ""
+var info1 = "";
+var stepBox = Container.template(function($) { return {
+	contents: [
+		new Line({left:0, bottom:10, width:291, 
+			contents:[
+				new Container({ left:0,
+					contents:[
+						new Picture({top:0, url:"buttons/schedule_stepbox.png"}),
+						new Line({top:0, height:57,
+							contents:[
+								new Label({left:6, string:$.step, style:titleStyle}),
+								new Column({left:20, contents: [$.label1, $.label2]})
+							]
+						})
+					]
+				}),
+				new Picture({left: 5, url:"buttons/schedule_deletebutton.png", active:true,
+					behavior: Object.create(Behavior.prototype, {
+						onTouchEnded: { value: function(content) {
+							instructionContainer.col.remove(content.container.container);
+						}}
+				}) })
+			]
+		})
+	]
+}});
 var addButtonTemplate = BUTTONS.Button.template(function($){ return{
-		height: 35, width: 90, skin:greenS,
-        contents: [
-                new Label({string:"Add Step", name:"addLabel", style: whiteLabelStyle})
+        skin:greenS, width:74, height: 27, contents: [
+                new Label({string:"Add", name:"addLabel", style: whiteLabelStyle})
         ],
         behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
                 onTouchBegan: { value:  function(button){
-					button.skin = greyS;
+					addButtonBG.url = "buttons/schedule_addbutton2.png";
+					button.skin = buttonPressedS;
 				}},
 				onTouchEnded: { value:  function(button){
+					addButtonBG.url = "buttons/schedule_addbutton.png";
 					button.skin = greenS;
-					if (allFieldsFilled()) {
+					if (checkError()) {
 						if (hasError) {
 							mainFieldContainer.remove(errorMessage);
 						}
 						updateInfo();
                     	info1 = "Step " + step + ": " + info.action + " at " + info.temperature + "°F";
-                    	info1Label = new Label({top:5, left:0, bottom:0, height:20, string:info1, style: labelStyle});
+                    	info1Label = new Label({top:5, left:0, bottom:0, height:20, string:info1, style: fieldStyle});
                     	var info2 = "for " + info.hour + " hours and " + info.minutes + " minutes";
-                    	info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: labelStyle});
-                    	addLabelContainer = new Column({left:0, right:0,contents: [info1Label, info2Label]});
+                    	info2Label = new Label({top:0, left:0, bottom:5, height:20, string:info2, style: fieldStyle});
+                    	var data = {
+      						label1: info1Label,
+      						label2: info2Label,
+      						step: step
+   						};
                     	schedSteps.steps[schedSteps.size] = info1;
                     	schedSteps.size += 1;
                     	schedSteps.steps[schedSteps.size] = info2;
                     	schedSteps.size += 1;
-                    	instructionContainer.col.add(addLabelContainer);
+                    	instructionContainer.col.add(new stepBox(data));
                     	mainFieldContainer.remove(fieldContainer);
                     	step++;
                     	reinitialize();
@@ -245,31 +298,29 @@ var addButtonTemplate = BUTTONS.Button.template(function($){ return{
 				}}
         })
 }});
-
+var addButtonBG = new Picture({top:0, url:"buttons/schedule_addbutton.png"});
 var addButton = new addButtonTemplate();
+var addButtonContainer = new Container({top:0, contents:[addButtonBG, new addButtonTemplate()]});
 var addButtonContainerTemplate = Container.template(function($) { return {
-	left:10, top:-5, skin: greenS, contents:[addButton]
+	top:7, contents:[addButtonContainer]
 }});
 
-/* time */
-var timeLabel = new Label({ left:4, style: labelStyle, string: "Time"});
-var colonLabel = new Label({ style: labelStyle, string: ":"});
-var timeContainer = new Line({left:0, top:5, bottom:10, contents:[timeLabel, hourContainer, colonLabel, minuteContainer, new addButtonContainerTemplate()]});
-
 /* field container template */
-var stepLabel = new Label({top:10, left:0, string:"Step 1", style:labelStyle});
+var stepLabel = new Label({top:-3, string:"Step 1", style:whiteLabelStyle});
+var tempActionTimeContainer = new Container({top:0, contents:[timeContainer, tempActionContainer]});
 var fieldContainerTemplate = Container.template(function($) { return {
-	name:"fieldContainer", top:10,skin: greenBorderS, active: true,
+	name:"fieldContainer", top:10, active: true,
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 					onTouchBegan: { value:  function(button) {
 						KEYBOARD.hide()
 						subContainer.focus()
 						}}}),
 	contents: [
-		new Column({left:15, top:0, right:15, width: 270, contents:[stepLabel,tempActionContainer,timeContainer]})
+		new Column({top:0, contents:[stepLabel, tempActionTimeContainer, new addButtonContainerTemplate()]})
 	]
 }});
-var fieldContainer = new fieldContainerTemplate();
+var fieldContainerBG = new Picture({top:0, url:"buttons/schedule_addstepbox.png"});
+var fieldContainer = new Container({top:10, contents:[fieldContainerBG, new fieldContainerTemplate()]});
 
 /* instruction container*/
 var instructionContainerTemplate = Container.template(function($) { return {
@@ -339,7 +390,7 @@ var subContainer = new Column({top:0, left:0, right:0, skin:whiteSkin, active:tr
 					onTouchBegan: { value: function(button) {
 							button.style = touchBackStyle
 							}}
-					})}), new Label({left:80,string: "Set Schedule", style: titleStyle}) ]
+					})}), new Label({left:80,string: "New Schedule", style: titleStyle}) ]
 		}),
 		nameContainer,
 		mainFieldContainer,
