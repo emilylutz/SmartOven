@@ -28,7 +28,22 @@ Handler.bind("/backToMain", Behavior({
 	onInvoke: function(handler, message){
 		mainScreen.run( new TRANSITIONS.Push(), schedMainScreen, statusScreen, { direction : "right", duration : 300 } );
 	},
-}));	
+}));
+
+/* Transition from startSched to schedMain */
+Handler.bind("/startSchedToSchedMain", Behavior({
+	onInvoke: function(handler, message){
+		mainScreen.run( new TRANSITIONS.Push(), startSched, schedMainScreen, { direction : "right", duration : 300 } );
+	},
+}));
+
+/* Transition from savedSched to addSched */
+Handler.bind("/savedSchedToAddSched", Behavior({
+	onInvoke: function(handler, message){
+		mainScreen.run( new TRANSITIONS.Push(), savedSched, addSchedScreen, { direction : "right", duration : 300 } );
+	},
+}));
+	
 
 /* Transition from schedScreen (schedules page) to statusScreen (main page) */
 Handler.bind("/savedToMain", Behavior({
@@ -39,7 +54,7 @@ Handler.bind("/savedToMain", Behavior({
 
 AddNeedClean = 0;
 SavedNeedClean = 0
-/* Transition from statusScreen (main page) to schedScreen (schedules page) */
+/* Transition from schedpage to AddschedScreen (add schedules page) */
 Handler.bind("/toAddSched", Behavior({
 	onInvoke: function(handler, message){
 		if (AddNeedClean) {
@@ -66,6 +81,13 @@ Handler.bind("/backToSchedMain", Behavior({
 Handler.bind("/startToSchedMain", Behavior({
 	onInvoke: function(handler, message){
 		mainScreen.run( new TRANSITIONS.Push(),startSched ,schedMainScreen, { direction : "right", duration : 300 } );
+	},
+}));
+
+/* Transition from startSchedScreen  to statusScreen (main page) */
+Handler.bind("/startToMain", Behavior({
+	onInvoke: function(handler, message){
+		mainScreen.run( new TRANSITIONS.Push(),startSched ,statusScreen, { direction : "right", duration : 300 } );
 	},
 }));
 

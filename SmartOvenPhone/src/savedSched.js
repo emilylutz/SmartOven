@@ -5,12 +5,24 @@ var backStyle = new Style({ font:"20px Heiti SC", color:"White", horizontal:"cen
 var plusStyle = new Style({ font:"40px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
 var nextStyle = new Style({ font:"30px Heiti SC", color:"gray", horizontal:"center", vertical:"top" });
 var whiteLabelStyle = new Style({ font:"16px Heiti SC", color:"white", horizontal:"center", vertical:"middle" });
+var touchBackStyle = new Style({ font:"20px Heiti SC", color:"#545e5d", horizontal:"center", vertical:"top" });
 
 var greenS = new Skin({fill:"#6ebab5"});
 var greyS = new Skin({fill:"gray"});
 var whiteSkin = new Skin({fill:"white"});
 var action = ""
 var schedNameLabel = new Label({left:40, string: "", style: titleStyle})
+var savedSchedObj;
+Handler.bind("/getSchedSteps", Object.create(Behavior.prototype, {
+	onInvoke: { value: function( handler, message ){
+			msgString = JSON.stringify({steps:savedSchedObj,name:schedNameLabel.string});
+			message.responseText = msgString
+			message.status = 200;
+			msg = new Message("/saveSchedule");
+			msg.requestText = msgString
+			application.invoke(msg,Message.JSON);
+			}}
+}));
 Handler.bind("/receiveNewSchedInfo", 
 	Behavior({
 	onInvoke: function(handler, message){
@@ -20,6 +32,7 @@ Handler.bind("/receiveNewSchedInfo",
 		if (text != undefined) {
 			var msg = JSON.parse(text);
 			sched = msg.steps
+			savedSchedObj = msg.steps
 			stepNum = sched.size + 1
 			schedNameLabel.string = msg.name
 			for (i = 0; i < stepNum-1;i++) {
@@ -29,9 +42,10 @@ Handler.bind("/receiveNewSchedInfo",
                 stepsContainer.add(addLabelContainer33);
                 i += 1
 				}
-			//stepsContainer.skin = greenS
-				}}
+			
 
+				}}
+			
 			}));
 			
 /* step 1 */
@@ -62,7 +76,12 @@ var startButtonTemplate = BUTTONS.Button.template(function($){ return{
 				}},
 				onTouchEnded: { value:  function(button){
 					button.skin = greenS;
-					application.invoke(new Message("/hardcodedInstruction"));
+					startNewSched = new Message("/hardcodedInstruction");
+					startNewSched.requestText = JSON.stringify({steps:savedSchedObj,name:schedNameLabel.string});
+					application.invoke(startNewSched,Message.TEXT);
+					saveNewSched = new Message("/saveSchedule");
+					saveNewSched.requestText = startNewSched.requestText
+					application.invoke(saveNewSched,Message.TEXT);
 					application.invoke(new Message("/savedToMain"));
 				}}
         })
@@ -84,7 +103,18 @@ exports.mainContainer = new Column.template(function($) { return {top:0, left:0,
 	contents:[
 		new Line({height: 60, left:0, right:0, skin:greenS, top:0,
 			contents: [ 
-				new Label({left:5, string: "❮ Back", style: backStyle}),
+				new Label({left:5, string: "❮ Back", style: backStyle,active:true,
+				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+					onTap: { value:  function(button) {
+						application.invoke(new Message("/savedSchedToAddSched"));
+						application.invoke(new Message("/cleanSavedSched"));
+						stepsCon.empty(0,stepsCon.length);
+						button.style= backStyle
+						}},
+					onTouchBegan: { value: function(button) {
+							button.style = touchBackStyle
+							}}
+					})}),
 				schedNameLabel,
 			]
 		}),

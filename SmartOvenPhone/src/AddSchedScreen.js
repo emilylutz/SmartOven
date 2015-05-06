@@ -38,6 +38,9 @@ info.menu = false;
 finalSchedName = ""
 var schedSteps = new Object();
 schedSteps.steps = [];
+schedSteps.hrs = [];
+schedSteps.mins = [];
+schedSteps.temps = [];
 schedSteps.size = 0;
 Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
 //@line 27
@@ -167,7 +170,7 @@ var dropDownMenu = new Container({left:0, right:0, top:28, contents:[dropDownBG,
 var actionContainer = new Container({top:10, height:65, contents:[aFieldBG, aField, aFieldArrow]});
 
 /* temperature */
-var temperatureField = new Label({top:0, style: fieldStyle, string: "000"});
+var temperatureField = new Label({top:0, style: fieldStyle, string: ""});
 var tFieldNameLabel = new Label({style: labelStyle, string:"Temp"});
 var tFieldDegreeLabel = new Label({style: labelStyle, string:"°F"});
 var tFieldBG = new Picture({top:0, url:"buttons/schedule_tinyField.png"});
@@ -280,7 +283,10 @@ var addButtonTemplate = BUTTONS.Button.template(function($){ return{
       						label2: info2Label,
       						step: step
    						};
-                    	schedSteps.steps[schedSteps.size] = info1;
+                     	schedSteps.steps[schedSteps.size] = info1;
+                    	schedSteps.temps[schedSteps.size] = info.temperature
+                    	schedSteps.hrs[schedSteps.size] = info.hour
+                    	schedSteps.mins[schedSteps.size] = info.minutes
                     	schedSteps.size += 1;
                     	schedSteps.steps[schedSteps.size] = info2;
                     	schedSteps.size += 1;
