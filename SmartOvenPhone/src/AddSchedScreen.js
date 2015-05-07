@@ -30,6 +30,7 @@ var keyboardButtonStyle = new Style({font:"20px Heiti SC", color:"black", align:
 var doneMessage = ""
 var clearS = new Skin({fill:""});
 
+var DMAdded = 0;
 var info = new Object();
 info.action = 'Bake';
 info.temperature = 0;
@@ -44,6 +45,18 @@ schedSteps.mins = [];
 schedSteps.temps = [];
 schedSteps.size = 0;
 schedSteps.normSize = 0;
+function schedStepsRemove(stepNum){
+/**
+	x = stepNum - 1;
+	for (i =0;i<=x;i++) {
+		if (i ==x) {
+		 for (j = i; j<schedSteps.normSize-1;j++) {
+		 	schedSteps.hrs[j] = schedSteps.hrs[j+1]
+		 	schedSteps.hrs[j] = schedSteps.mins[j+1]
+		 	schedSteps. **/
+			 
+		
+}
 Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
 //@line 27
 	onInvoke: { value: function( handler, message ){
@@ -222,7 +235,7 @@ function reinitialize() {
     info.menu = false;
     stepLabel.string = "Step " + step;
     aField.lbl.string = "Action";
-    temperatureField.string = "0";
+    temperatureField.string = "";
     hourField.string = "00";
     minuteField.string = "00";
 };
@@ -249,9 +262,10 @@ var stepBox = Container.template(function($) { return {
 						})
 					]
 				}),
-				new Picture({left: 5, url:"buttons/schedule_deletebutton.png", active:true,
+				new Picture({left: 5,step:$.step, url:"buttons/schedule_deletebutton.png", active:true,
 					behavior: Object.create(Behavior.prototype, {
 						onTouchEnded: { value: function(content) {
+							schedStepsRemove($.step);
 							instructionContainer.col.remove(content.container.container);
 						}}
 				}) })
@@ -363,6 +377,8 @@ var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
 						}
 						doneMessage = new Label({top:20, string:"Your schedule has been saved!", style: labelStyle});
                 		subContainer.add(doneMessage);
+                		DMAdded = 1;
+					
 					}
 					application.invoke(new Message("/receiveNewSchedInfo"));
 					application.invoke(new Message("/addToSaved"));
@@ -401,7 +417,9 @@ Handler.bind("/cleanAddSched", Object.create(Behavior.prototype, {
 		nField = nameField({name: ""});
 		nameContainer.add(nField);
 		stepLabel.string = "Step 1"
-		subContainer.remove(doneMessage);
+				if (DMAdded) {
+			subContainer.remove(doneMessage);
+			}
 		mainFieldContainer.remove(instructionContainer);
 		instructionContainer = new instructionContainerTemplate();
 		mainFieldContainer.add(instructionContainer);

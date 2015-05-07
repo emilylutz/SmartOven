@@ -1,5 +1,4 @@
 //@module
-// KPR Script file
 var labelStyle = new Style({ font:"20px Heiti SC", color:"black", horizontal:"center", vertical:"middle" });
 var titleStyle = new Style({ font:"28px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
 var backStyle = new Style({ font:"20px Heiti SC", color:"White", horizontal:"center", vertical:"top" });
@@ -16,11 +15,11 @@ var schedList = new Array();
 var currSchedule;
 var startSchedTitle = new Label({left:40, string: "", style: titleStyle})
 var chickenTemp = new Object();
-chickenTemp.steps =["Step1: Bake at 350°F","for  0 hours and 25 minutes","Step2: Bake at 250", "for 1 min"]
-chickenTemp.size = 4;
-chickenTemp.temps = [350,250]
-chickenTemp.hrs = [0,0]
-chickenTemp.mins = [1,1]
+chickenTemp.steps =["Step1: Bake at 350°F","for  0 hours and 25 minutes"]
+chickenTemp.size = 2;
+chickenTemp.temps = [350]
+chickenTemp.hrs = [0]
+chickenTemp.mins = [1]
 schedList["Chicken"] = chickenTemp;
 Handler.bind("/saveSchedule", Object.create(Behavior.prototype, {
 	onInvoke: { value: function( handler, message ){
