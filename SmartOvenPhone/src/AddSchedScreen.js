@@ -28,6 +28,7 @@ var greyS = new Skin({fill:"gray"});
 var buttonPressedS = new Skin({fill:"7d9694"});
 var keyboardButtonStyle = new Style({font:"20px Heiti SC", color:"black", align:"left"});
 var doneMessage = ""
+var clearS = new Skin({fill:""});
 
 var info = new Object();
 info.action = 'Bake';
@@ -42,6 +43,7 @@ schedSteps.hrs = [];
 schedSteps.mins = [];
 schedSteps.temps = [];
 schedSteps.size = 0;
+schedSteps.normSize = 0;
 Handler.bind("/getNewSchedInfo", Object.create(Behavior.prototype, {
 //@line 27
 	onInvoke: { value: function( handler, message ){
@@ -284,9 +286,10 @@ var addButtonTemplate = BUTTONS.Button.template(function($){ return{
       						step: step
    						};
                      	schedSteps.steps[schedSteps.size] = info1;
-                    	schedSteps.temps[schedSteps.size] = info.temperature
-                    	schedSteps.hrs[schedSteps.size] = info.hour
-                    	schedSteps.mins[schedSteps.size] = info.minutes
+                    	schedSteps.temps[schedSteps.normSize] = info.temperature
+                    	schedSteps.hrs[schedSteps.normSize] = info.hour
+                    	schedSteps.mins[schedSteps.normSize] = info.minutes
+                    	schedSteps.normSize += 1
                     	schedSteps.size += 1;
                     	schedSteps.steps[schedSteps.size] = info2;
                     	schedSteps.size += 1;
@@ -339,9 +342,9 @@ var noStepsErrorMessage = new Label({top:10, string:"**Please add a step to your
 var noNameErrorMessage = new Label({top:10, string:"**Please name your schedule before saving.", style:errorStyle});
 var hasDoneError = false;
 var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
-        height: 35, width: 150, skin:greenS,
+        height: 40,left:0,right:0,top:420, skin:greenS,
         contents: [
-                new Label({string:"Done", name:"doneLabel", style: whiteLabelStyle})
+                new Label({string:"Done", name:"doneLabel", style: backStyle})
         ],
         behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
                 onTouchBegan: { value:  function(button){
@@ -370,7 +373,7 @@ var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
 
 var doneButton = new doneButtonTemplate();
 var doneButtonContainerTemplate = Container.template(function($) { return {
-	top:10, left:10, bottom: 20, contents:[doneButton]
+	top:10, left:0, right:0,skin:greenS, contents:[doneButton]
 }});
 var mainFieldContainer = new Column({name:"subCol", contents:[fieldContainer, instructionContainer], active:true});
 
@@ -378,7 +381,7 @@ var scroller = SCROLLER.VerticalScroller.template(function($){ return{
 	contents:$.contents
 }});
 
-var subContainer = new Column({top:60, left:0, right:0, skin:whiteSkin, active:true,
+var subContainer = new Column({top:60,left:0, right:0, skin:clearS, active:true,
 	behavior: Behavior({
 		onTouchEnded: function(content){
 			KEYBOARD.hide();
@@ -388,7 +391,6 @@ var subContainer = new Column({top:60, left:0, right:0, skin:whiteSkin, active:t
 	contents:[
 		nameContainer,
 		mainFieldContainer,
-		new Container({top:20, contents: [new doneButtonContainerTemplate()]}),
 	]
 });
 
@@ -406,6 +408,7 @@ Handler.bind("/cleanAddSched", Object.create(Behavior.prototype, {
 		schedSteps = new Object();
 		schedSteps.steps = [];
 		schedSteps.size = 0;
+		schedSteps.normSize = 0;
 		step = 1;
 		info = new Object();
 		info.action = 'Bake';
@@ -417,10 +420,20 @@ Handler.bind("/cleanAddSched", Object.create(Behavior.prototype, {
 			}}
 }));
 
-
-var mainScroller = new scroller({skin:whiteSkin, contents:[subContainer]});
+Handler.bind("/addSchedOpen", Behavior({
+	onInvoke: function(handler, message){
+		mainScroller.coordinates = {right:0, left:0,top:-50};
+	},
+}));
+Handler.bind("/addSched", Behavior({
+	onInvoke: function(handler, message){
+		mainScroller.coordinates = {right:0,left:0,top:0};
+	},
+}));
+var mainScroller = new scroller({contents:[subContainer]});
+var mainScrollerCon = new Container({contents:[mainScroller],top:0,left:0,right:0,bottom:40,clip:true});
 exports.mainContainer = new Container.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, 
-	contents:[		mainScroller, new Container({height: 60, left:0, right:0, skin:greenS, top:0,
+	contents:[	new doneButtonTemplate({}),	mainScrollerCon, new Container({height: 60, left:0, right:0, skin:greenS, top:0,
 			contents: [ new Label({ left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
 				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 					onTap: { value:  function(button) {

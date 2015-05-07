@@ -16,11 +16,11 @@ var schedList = new Array();
 var currSchedule;
 var startSchedTitle = new Label({left:40, string: "", style: titleStyle})
 var chickenTemp = new Object();
-chickenTemp.steps =["Step1: Bake at 350","for 25 min"]
-chickenTemp.size = 2;
-chickenTemp.temps = [350]
-chickenTemp.hrs = [0]
-chickenTemp.mins = [25]
+chickenTemp.steps =["Step1: Bake at 350°F","for  0 hours and 25 minutes","Step2: Bake at 250", "for 1 min"]
+chickenTemp.size = 4;
+chickenTemp.temps = [350,250]
+chickenTemp.hrs = [0,0]
+chickenTemp.mins = [1,1]
 schedList["Chicken"] = chickenTemp;
 Handler.bind("/saveSchedule", Object.create(Behavior.prototype, {
 	onInvoke: { value: function( handler, message ){
@@ -52,9 +52,9 @@ Handler.bind("/lookAtSched", Object.create(Behavior.prototype, {
 stepsCon = new Column({left:0,right:0,top:0,bottom:0,contents: []});
 /* start schedule button */
 var startButtonTemplate = BUTTONS.Button.template(function($){ return{
-        height: 35, width: 150, skin:greenS,
+        height: 40,left:0,right:0,bottom:0, skin:greenS,
         contents: [
-                new Label({string:"Start Schedule", name:"doneLabel", style: whiteLabelStyle})
+                new Label({string:"Start Schedule", name:"doneLabel", style: backStyle})
         ],
         behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
                 onTouchBegan: { value:  function(button){
@@ -97,6 +97,6 @@ exports.mainContainer = new Column.template(function($) { return {top:0, left:0,
 			]
 		}),
 		stepsCon,
-		new startButtonContainerTemplate()
+		new startButtonTemplate({})
 	]
 }});

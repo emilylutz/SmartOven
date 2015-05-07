@@ -115,17 +115,7 @@ Handler.bind("/setTimer", Behavior({
 		handler.invoke(new Message("/closeNumKey"));
 	},
 }));
-Handler.bind("/addSchedOpen", Behavior({
-	onInvoke: function(handler, message){
-		addSchedScreen.coordinates = {right:0, left:0, bottom:150};
-	},
-}));
 
-Handler.bind("/addSched", Behavior({
-	onInvoke: function(handler, message){
-		addSchedScreen.coordinates = {right:0, left:0, bottom:0,top:0};
-	},
-}));
 
 screenBot = 0;
 Handler.bind("/openNumKey", Behavior({

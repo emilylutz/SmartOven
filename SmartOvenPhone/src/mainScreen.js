@@ -23,7 +23,7 @@ var smallStyle = new Style({font:"15px Heiti SC", color:"black", align:"left"});
 var smallWhiteStyle = new Style({font:"15px Heiti SC", color:"White", align:"left"});
 var stepStyle = new Style({font:"17px Heiti SC", color:"black", align:"left"});
 var okayStyle = new Style({font:"20px Heiti SC", color:"#006EFF", align:"left"});
-var whiteStyle = new Style({font:"20px Heiti SC", color:"white", align:"left"});
+var whiteStyle = new Style({font:"22px Heiti SC", color:"white", align:"left"});
 var smokeAlertStyle = new Style({font:"bold 30px Heiti SC", color: "red"});
 var timerAlertStyle = new Style({font:"bold 25px Heiti SC", color: "black"});
 
@@ -44,8 +44,8 @@ var statusCon = new Container({top:10, left:0,right:0, height:90, contents: [sta
 /**** OFF BUTTON ****/
 var offButtonLabel = new Label({left:0, right:0,top:0, string:"Turn Off", style:whiteStyle});
 var offBg = new Picture({left:50,right:50,top:30, url:"buttons/offBg.png"});
-var offButtonTemp = BUTTONS.Button.template(function($){ return{
-		top:95,left:70, right:70,width:100,height:30, skin:clearS,
+var offButton = new Container({
+		active:true,top:95,left:70, right:70,width:100,height:30, skin:clearS,
 	contents:[offButtonLabel],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
@@ -54,14 +54,14 @@ var offButtonTemp = BUTTONS.Button.template(function($){ return{
 		onTouchBegan: { value:  function(button){
 			offBg.url = "buttons/offBg2.png"
 		}}
-	})
-}});
-var offButton = new offButtonTemp({});
+		})
+});
+//var offButton = new offButtonTemp({});
 
 var startStepBg = new Picture({left:0,right:0,top:-70,width:60, url:"buttons/startStep.png"});
 var startStepButtonTemp = BUTTONS.Button.template(function($){ return{
 		top:30 ,right:10,height:40, skin:clearS,
-	contents:[startStepBg],
+	contents:[startStepBg, new Label({string:"Start",style:smallWhiteStyle})],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
 			startStepBg.url = "buttons/startStep.png";
@@ -130,10 +130,10 @@ var setTempValBg = new Picture({left:60,height:40, url: "buttons/box.png"});
 var setTempCon = new Container({left:20,right:20,top:10, height: 20,contents: [setTempBg,setTempValBg,setTempButton,setTempLabel,setTempVal,setTempDeg]});
 
 /** Schedules Button **/
-var schedulesTemplate = BUTTONS.Button.template(function($){ return{
-		top:10,left:20, right:20, height: 60,skin:clearS,
+var schedulesTemplate = Container.template(function($){ return{
+		top:10,left:20, right:20, height: 60,skin:clearS,active:true,
 	contents:[
-		schedBg, new Label({height:10, string:"Schedules >",style:whiteStyle}), 
+		schedBg, new Label({height:10, string:"Schedules ❯",style:whiteStyle}), 
 	],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
@@ -198,8 +198,8 @@ function convertTime(str) {
 
 
 var timerCountdown = 0;
-var startTimerTemp = BUTTONS.Button.template(function($){ return{
-		top: 100 ,left:30, right:30, height: 50,skin:clearS,
+var startTimerTemp = Container.template(function($){ return{
+		top: 100 ,left:30, right:30, height: 50,skin:clearS,active:true,
 	contents:[
 		new Label({height:10, string:$.textForLabel,style:whiteStyle}), 
 	],
@@ -302,7 +302,7 @@ var timerCon = new Container({ left:0,right:0,height:150, contents : [setTimerCo
 /**** Recent Schedules Container ***/
 
 var recentSchedTemp = BUTTONS.Button.template(function($){ return{
-		top:5,left:0,height:30, right:0, skin:clearS,schedObj:$.schedObj,title:$.title,
+		top:5,left:0,height:30, right:0, skin:clearS,schedObj:$.schedObj,title:$.title,name:$.name,
 	contents:[new Label({left:20,style:smallStyle,string:$.title,left:10}),new Label({skin:greenS, width:50,height:25,right:30,string:"Start",style:smallWhiteStyle, skin:greenS})],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
@@ -320,16 +320,23 @@ var recentSchedTemp = BUTTONS.Button.template(function($){ return{
 		}}
 	})
 }});
+
+function findObj(container,ID) {
+	for (i =0;i<container.length;i++) {
+		if (container[i].name == ID) {
+			return container[i]
+			}
+		}}
 Handler.bind("/addToRecent", Behavior({
 	onInvoke: function(handler, message){
-		firstCon = recentSchedColumn.first
+		if (findObj(recentSchedScroll[0],schedTitleLabel.string) != undefined){
+			recentSchedScroll[0].remove(findObj(recentSchedScroll[0],schedTitleLabel.string))
+			}
+		firstCon = recentSchedScroll[0].first
 		if (firstCon != null) {
-			if (recentSchedColumn[schedTitleLabel.string] == undefined) {
-				newRecent = new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string});
-				newRecent.name = schedTitleLabel.string
-				recentSchedColumn.insert(newRecent, firstCon);
-			}} else {
-				recentSchedColumn.add(new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string}));
+				recentSchedScroll[0].insert(new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string,name:schedTitleLabel.string}), firstCon);
+		} else {
+				recentSchedScroll[0].add( new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string,name:schedTitleLabel.string}));
 			}
 			/**
 		if (recentSchedColumn.length > 5) {
@@ -340,11 +347,13 @@ Handler.bind("/addToRecent", Behavior({
 
 var recentSchedTab = new Picture({left:0,right:0, url: "buttons/schedTab.png"});
 var scrollTemp = SCROLLER.VerticalScroller.template(function($){ return{
-	contents:$.contents,left:$.left,right:$.right,top:$.top,bottom:$.bottom,
+	contents:$.contents,top:$.top,
 }});
-var recentSchedColumn = new Column({left:0,right:0,top:0,bottom:0, contents:[]});
-var recentSchedScroll = new scrollTemp({left:10,right:10,top:40,bottom:0, contents:[recentSchedColumn]});
-var recentSchedCon = new Container({left:0,right:0, height:150, contents:[recentSchedTab,recentSchedScroll]});
+
+
+var recentSchedScroll = new scrollTemp({top:0,contents:[new Column({left:0,right:0,top:0,contents:[]})]});
+var recentSchedScreen = new Container({left:10,right:10,top:40,bottom:0,contents:[recentSchedScroll],clip:true});
+var recentSchedCon = new Container({left:0,right:0, height:150, contents:[recentSchedTab,recentSchedScreen]});
 
 /** Camera Container **/
 var camTab = new Picture({left:0,right:0, url: "buttons/camTab.png"});
@@ -465,6 +474,9 @@ Handler.bind("/setTemp", Behavior({
 	},
 	onComplete: function(content, message, json) {
 		goalOvenTemp = json.goalTemp;
+		if (findObj(statusCon,"prevCon") != undefined) {
+			statusCon.remove(previewCon)
+			}
 		statusLabel.string = "Heating";
 		statusLabel.style = statusStyle;
 	    statusLabel.coordinates = {top:5,left:0,right:0};
@@ -523,7 +535,12 @@ Handler.bind("/reachedTemp", Behavior({
 		//statusLabel.string = "Smoke detected in oven!";
 		if (usingSchedule && currentStep == 1) {
 			nextStepPreview();
-			}
+			} else if (usingSchedule) {
+				statusLabel.string = "";
+				if(findObj(statusCon,"prevCon") == undefined) {
+					statusCon.add(previewCon)
+					}
+				}
 		application.add(reachedTempCon);
 	}
 }));
@@ -611,7 +628,6 @@ var currentStep = 0;
 var currentLabelStep = 0;
 Handler.bind("/startNextStep", {
     onInvoke: function(handler, message){
-    	
        	setTempVal.string = msSched.temps[currentStep];
        	hourVal.string = timeString(msSched.hrs[currentStep]);
        	minVal.string = timeString(msSched.mins[currentStep]);
@@ -630,8 +646,8 @@ Handler.bind("/startNextStep", {
     		//statusLabel.style = stepStyle
     		stepLabel1.string = msSched.steps[currentLabelStep]
     		stepLabel2.string = msSched.steps[currentLabelStep+=1]
-    		currentLabelStep += 2;
-    		if (statusCon["prevCon"] == null) {
+    		currentLabelStep += 1;
+    		if (findObj(statusCon,"prevCon") == undefined) {
     			statusCon.add(previewCon)
     			}
     		}

@@ -66,9 +66,9 @@ var addLabelContainer1 = new Line({top:0, left:15, right:0, height:80, skin:whit
 
 /* start schedule button */
 var startButtonTemplate = BUTTONS.Button.template(function($){ return{
-        height: 35, width: 150, skin:greenS,
+        height: 40, left:0,right:0,bottom:0, skin:greenS,
         contents: [
-                new Label({string:"Start Schedule", name:"doneLabel", style: whiteLabelStyle})
+                new Label({string:"Start Schedule", name:"doneLabel", style: backStyle})
         ],
         behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
                 onTouchBegan: { value:  function(button){
@@ -119,6 +119,6 @@ exports.mainContainer = new Column.template(function($) { return {top:0, left:0,
 			]
 		}),
 		stepsContainer,
-		new startButtonContainerTemplate()
+		new startButtonTemplate({})
 	]
 }});
