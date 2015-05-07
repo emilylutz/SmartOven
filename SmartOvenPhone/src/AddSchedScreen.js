@@ -254,21 +254,14 @@ var stepBox = Container.template(function($) { return {
 				new Container({ left:0,
 					contents:[
 						new Picture({top:0, url:"buttons/schedule_stepbox.png"}),
-						new Line({top:0, height:57,
+						new Line({top:0, left:8, height:57,
 							contents:[
 								new Label({left:6, string:$.step, style:titleStyle}),
 								new Column({left:20, contents: [$.label1, $.label2]})
 							]
 						})
 					]
-				}),
-				new Picture({left: 5,step:$.step, url:"buttons/schedule_deletebutton.png", active:true,
-					behavior: Object.create(Behavior.prototype, {
-						onTouchEnded: { value: function(content) {
-							schedStepsRemove($.step);
-							instructionContainer.col.remove(content.container.container);
-						}}
-				}) })
+				})
 			]
 		})
 	]
