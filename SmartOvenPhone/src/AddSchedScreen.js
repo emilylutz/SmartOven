@@ -378,7 +378,7 @@ var scroller = SCROLLER.VerticalScroller.template(function($){ return{
 	contents:$.contents
 }});
 
-var subContainer = new Column({top:0, left:0, right:0, skin:whiteSkin, active:true,
+var subContainer = new Column({top:60, left:0, right:0, skin:whiteSkin, active:true,
 	behavior: Behavior({
 		onTouchEnded: function(content){
 			KEYBOARD.hide();
@@ -386,18 +386,6 @@ var subContainer = new Column({top:0, left:0, right:0, skin:whiteSkin, active:tr
 		}
 	}),
 	contents:[
-		new Container({height: 60, left:0, right:0, skin:greenS, top:0,
-			contents: [ new Label({ left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
-				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
-					onTap: { value:  function(button) {
-						application.invoke(new Message("/backToSchedMain"));
-						button.style= backStyle
-						}},
-					onTouchBegan: { value: function(button) {
-							button.style = touchBackStyle
-							}}
-					})}), new Label({left:80,string: "New Schedule", style: titleStyle}) ]
-		}),
 		nameContainer,
 		mainFieldContainer,
 		new Container({top:20, contents: [new doneButtonContainerTemplate()]}),
@@ -432,5 +420,16 @@ Handler.bind("/cleanAddSched", Object.create(Behavior.prototype, {
 
 var mainScroller = new scroller({skin:whiteSkin, contents:[subContainer]});
 exports.mainContainer = new Container.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, 
-	contents:[ mainScroller ]}});
+	contents:[		mainScroller, new Container({height: 60, left:0, right:0, skin:greenS, top:0,
+			contents: [ new Label({ left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
+				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
+					onTap: { value:  function(button) {
+						application.invoke(new Message("/backToSchedMain"));
+						button.style= backStyle
+						}},
+					onTouchBegan: { value: function(button) {
+							button.style = touchBackStyle
+							}}
+					})}), new Label({left:80,string: "New Schedule", style: titleStyle}) ]
+		}) ]}});
 	

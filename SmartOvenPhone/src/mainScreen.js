@@ -3,7 +3,7 @@ var THEME = require('themes/flat/theme');
 var BUTTONS = require('controls/buttons');
 var CONTROL = require('mobile/control');
 var KEYBOARD = require('numKeyboard.js');
-var SCROLLER2 = require('mobile/scroller');
+var SCROLLER = require('mobile/scroller');
 var SCREEN = require('mobile/screen');
 var reachedGoalTemp = 1;
 var usingSchedule = 0;
@@ -322,14 +322,14 @@ var recentSchedTemp = BUTTONS.Button.template(function($){ return{
 }});
 Handler.bind("/addToRecent", Behavior({
 	onInvoke: function(handler, message){
-		firstCon = recentSchedScroll.first.list.first
+		firstCon = recentSchedColumn.first
 		if (firstCon != null) {
-			if (recentSchedScroll.first.list[schedTitleLabel.string] == undefined) {
+			if (recentSchedColumn[schedTitleLabel.string] == undefined) {
 				newRecent = new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string});
 				newRecent.name = schedTitleLabel.string
-				recentSchedScroll.first.list.insert(newRecent, firstCon);
+				recentSchedColumn.insert(newRecent, firstCon);
 			}} else {
-			recentSchedScroll.first.list.add(new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string}));
+				recentSchedColumn.add(new recentSchedTemp({schedObj:msSched,title:schedTitleLabel.string}));
 			}
 			/**
 		if (recentSchedColumn.length > 5) {
@@ -339,24 +339,11 @@ Handler.bind("/addToRecent", Behavior({
 }));	
 
 var recentSchedTab = new Picture({left:0,right:0, url: "buttons/schedTab.png"});
-var scrollCon = Container.template(function($) { return {
-	left:10, right:10, top:40, bottom:0,
-	contents: [
-	   		/* Note that the scroller is declared as having only an empty
-	   		 * Column and a scrollbar.  All the entries will be added 
-	   		 * programmatically. */ 
-	   		SCROLLER2.VerticalScroller($, { 
-	   			contents: [
-              			Column($, { left: 0, right: 0, top: 0, name: 'list', }),
-              		,		//SCROLLER2.VerticalScrollbar($, { })
-              			]
-	   		})
-	   		]
-	}});
-var dataMS = new Object();
-var recentSchedScroll = new scrollCon(dataMS);
-//var recentSchedColumn = new Column({left:0,right:0,top:0,bottom:0, contents:[]});
-//var recentSchedScroll = new Scroller({left:10,right:10,top:40,bottom:0, contents:[recentSchedColumn]});
+var scrollTemp = SCROLLER.VerticalScroller.template(function($){ return{
+	contents:$.contents,left:$.left,right:$.right,top:$.top,bottom:$.bottom,
+}});
+var recentSchedColumn = new Column({left:0,right:0,top:0,bottom:0, contents:[]});
+var recentSchedScroll = new scrollTemp({left:10,right:10,top:40,bottom:0, contents:[recentSchedColumn]});
 var recentSchedCon = new Container({left:0,right:0, height:150, contents:[recentSchedTab,recentSchedScroll]});
 
 /** Camera Container **/
