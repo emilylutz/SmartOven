@@ -197,7 +197,7 @@ function convertTime(str) {
 }
 
 
-var timerCountDown = 0;
+var timerCountdown = 0;
 var startTimerTemp = BUTTONS.Button.template(function($){ return{
 		top: 100 ,left:30, right:30, height: 50,skin:clearS,
 	contents:[
@@ -561,19 +561,21 @@ Handler.bind("/smokeDetectedAllClear", Behavior({
 //the "Start Timer" button will call /getTime
 Handler.bind("/getTime", {
     onInvoke: function(handler, message){
-    	if (pause == 0) {
-	        countdownLabel.string = convertTime(countdownLabel.string);
-	       	var msg = new Message(deviceURL + "setTimer");
-	        msg.requestText = countdownLabel.string;
-	        application.invoke(msg);
-	        if (countdownLabel.string == "DONE!" ){
-	        		timerCon.remove(countdownCon);
-					timerCon.add(setTimerCon);
-					timerCountdown = 0;
-				}
-			else {
-	        handler.invoke( new Message("/delay")); }
-	    } }
+    	if(timerCountdown == 1) {
+	    	if (pause == 0) {
+			        countdownLabel.string = convertTime(countdownLabel.string);
+			       	var msg = new Message(deviceURL + "setTimer");
+			        msg.requestText = countdownLabel.string;
+			        application.invoke(msg);
+			        if (countdownLabel.string == "DONE!" ){
+			        		timerCon.remove(countdownCon);
+							timerCon.add(setTimerCon);
+							timerCountdown = 0;
+						}
+					else {
+			        handler.invoke( new Message("/delay")); }
+			    } }
+			    }
 });
 Handler.bind("/delay", {
     onInvoke: function(handler, message){
@@ -592,7 +594,7 @@ Handler.bind("/pauseTimer", {
 });
 
 /*** resetting the Timer **/
-Handler.bind("/pauseTimer", {
+Handler.bind("/resetTimer", {
     onInvoke: function(handler, message){
         //do something
         }
