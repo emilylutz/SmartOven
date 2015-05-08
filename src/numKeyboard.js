@@ -4,6 +4,7 @@
 /* SKINS */
 var greenS = new Skin({fill:"#6ebab5"});
 var greenTouchS = new Skin({fill:"#7d9694"});
+
 var keySkin = new Skin({fill:"#fcfdfd",borders:{left:0,right:0,top:0,bottom:1},stroke:"#c2c5c8"});
 var darkGreyS = new Skin({fill:"#c2c5c8"});
 var greyS = new Skin({fill:"#fcfdfd"});
@@ -139,7 +140,7 @@ var delKeyTemplate = BUTTONS.Button.template(function($){ return{
 
 var enterKeyTemplate = BUTTONS.Button.template(function($){ return{
 		top:0,left:0 ,right:0, height: 35,skin:greenS,
-	contents:[ new Label({string:"enter",style:tempStyle})],
+	contents:[ new Label({string:"enter",style:whiteStyle})],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
 			button.skin = greenS;

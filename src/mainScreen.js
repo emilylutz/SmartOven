@@ -5,7 +5,7 @@ var CONTROL = require('mobile/control');
 var KEYBOARD = require('numKeyboard.js');
 var SCROLLER = require('mobile/scroller');
 var SCREEN = require('mobile/screen');
-var reachedGoalTemp = 1;
+var msReachedGoalTemp = 1;
 var usingSchedule = 0;
 
 /** SKINS **/
@@ -60,7 +60,7 @@ var offButton = new Container({
 
 var startStepBg = new Picture({left:0,right:0,top:-70,width:60, url:"buttons/startStep.png"});
 var startStepButtonTemp = BUTTONS.Button.template(function($){ return{
-		top:30 ,right:10,height:40, skin:clearS,
+		top:15 ,right:20,height:40, skin:clearS,
 	contents:[startStepBg, new Label({string:"Start",style:smallWhiteStyle})],
 	behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 		onTap: { value:  function(button){
@@ -74,7 +74,6 @@ var startStepButtonTemp = BUTTONS.Button.template(function($){ return{
 	})
 }});
 var startStepButton = new startStepButtonTemp({});
-
 /***** notification container *****/
 var darkenS = new Skin({fill:"#99000000"});
 var notificationCon = new Container.template(function($) { return {skin:darkenS, left:0,right:0, top:0, bottom:0,
@@ -357,7 +356,7 @@ var recentSchedCon = new Container({left:0,right:0, height:150, contents:[recent
 
 /** Camera Container **/
 var camTab = new Picture({left:0,right:0, url: "buttons/camTab.png"});
-var liveStream = new Picture({left:5,right:5,top:30, bottom:0, url: "buttons/ovenpic.png"});
+var liveStream = new Picture({left:5,right:5,top:35, bottom:0, url: "buttons/ovenpic.png"});
 var camCon = new Container({left:0, right:0,height: 150, contents: [camTab,liveStream]});
 
 /** Tab buttons **/
@@ -460,7 +459,9 @@ var offButtonPresent = 0;
 Handler.bind("/setTemp", Behavior({
 		onInvoke: function(handler, message) {
 		if (setTempVal.string != "") {
-			reachedGoalTemp = 0;
+			if (parseInt(curOvenTemp) <= parseInt(setTempVal.string)) {
+				msReachedGoalTemp = 0;
+				}
 			var msg = new Message(deviceURL + "setGoalTemp");
 			var goalTemp = parseInt(setTempVal.string);	
 			msg.requestText = goalTemp;
@@ -479,33 +480,10 @@ Handler.bind("/setTemp", Behavior({
 			}
 		statusLabel.string = "Heating";
 		statusLabel.style = statusStyle;
-	    statusLabel.coordinates = {top:5,left:0,right:0};
+	    statusLabel.coordinates = {top:20,left:0,right:0};
 	    ovenOn = true;
-		/*
-		if (goalOvenTemp == curOvenTemp) {
-	      statusLabel.string = "The oven is already at this temperature";
-	    } else {
-	      if (goalOvenTemp > curOvenTemp) {
-	        action = "Heating Up";
-	      } else {
-	        action = "Cooling Down";
-	      }
-	      statusLabel.string = action
-	      statusLabel.style = statusStyle;
-	      statusLabel.coordinates = {top:5,left:0,right:0};
-	    }
-	    */
 	}
 }));
-/*
-	onInvoke: function(handler, message){
-		statusLabel.string = "Heating..."
-		statusLabel.style = statusStyle;
-		statusLabel.coordinates = {top:5,left:0,right:0};
-		statusCon.add(offBg);
-		statusCon.add(offButton);
-		}
-})); */
 
 //the device pushes the temperature to the phone
 Handler.bind("/gotCurrentTemp", Behavior({
@@ -513,9 +491,8 @@ Handler.bind("/gotCurrentTemp", Behavior({
 		//update the display of the current temperature
 		curOvenTemp = message.requestText;
 		currTempVal.string = curOvenTemp;
-		if (!reachedGoalTemp && parseInt(curOvenTemp) >= parseInt(setTempVal.string)) {
+		if (!msReachedGoalTemp && parseInt(curOvenTemp) >= parseInt(setTempVal.string)) {
 			handler.invoke(new Message("/reachedTemp"))
-			reachedGoalTemp = 1;
 			}
 	}
 }));
@@ -533,6 +510,10 @@ Handler.bind("/smokeDetectedAlert", Behavior({
 Handler.bind("/reachedTemp", Behavior({
 	onInvoke: function(handler, message){
 		//statusLabel.string = "Smoke detected in oven!";
+		if (msReachedGoalTemp == 0) {
+			application.add(reachedTempCon);
+			msReachedGoalTemp = 1;
+			}
 		if (usingSchedule && currentStep == 1) {
 			nextStepPreview();
 			} else if (usingSchedule) {
@@ -541,7 +522,7 @@ Handler.bind("/reachedTemp", Behavior({
 					statusCon.add(previewCon)
 					}
 				}
-		application.add(reachedTempCon);
+		
 	}
 }));
 //the device pushes smoke detection to the phone

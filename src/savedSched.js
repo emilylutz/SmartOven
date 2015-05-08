@@ -6,7 +6,8 @@ var plusStyle = new Style({ font:"40px Heiti SC", color:"White", horizontal:"cen
 var nextStyle = new Style({ font:"30px Heiti SC", color:"gray", horizontal:"center", vertical:"top" });
 var whiteLabelStyle = new Style({ font:"16px Heiti SC", color:"white", horizontal:"center", vertical:"middle" });
 var touchBackStyle = new Style({ font:"20px Heiti SC", color:"#545e5d", horizontal:"center", vertical:"top" });
-
+var greenSBottom = new Skin({stroke:"#777777",borders: { left:0, right:0, top:0, bottom:2} , fill:"#6ebab5"});
+var greenSTop = new Skin({stroke:"#777777",borders: { left:0, right:0, top:2, bottom:0} , fill:"#6ebab5"});
 var greenS = new Skin({fill:"#6ebab5"});
 var greyS = new Skin({fill:"gray"});
 var whiteSkin = new Skin({fill:"white"});
@@ -66,7 +67,7 @@ var addLabelContainer1 = new Line({top:0, left:15, right:0, height:80, skin:whit
 
 /* start schedule button */
 var startButtonTemplate = BUTTONS.Button.template(function($){ return{
-        height: 40, left:0,right:0,bottom:0, skin:greenS,
+        height: 40, left:0,right:0,bottom:0, skin:greenSTop,
         contents: [
                 new Label({string:"Start Schedule", name:"doneLabel", style: backStyle})
         ],
@@ -101,7 +102,7 @@ Handler.bind("/cleanSavedSched", Object.create(Behavior.prototype, {
 }));
 exports.mainContainer = new Column.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, active:true,
 	contents:[
-		new Line({height: 60, left:0, right:0, skin:greenS, top:0,
+		new Line({height: 60, left:0, right:0, skin:greenSBottom, top:0,
 			contents: [ 
 				new Label({left:5, string: "❮ Back", style: backStyle,active:true,
 				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {

@@ -23,6 +23,8 @@ var dropDownSkin = new Skin({borders: { left:2, right:2, top:2, bottom:2 }, fill
 var nameInputSkin = new Skin({ borders: { left:2, right:2, top:2, bottom:2 }, fill: "white", stroke: 'gray', left: 5, right: 5, top: 5, bottom: 5});
 var whiteSkin = new Skin({fill:"white"});
 var greenS = new Skin({fill:"#6ebab5"});
+var greenSBottom = new Skin({stroke:"#777777",borders: { left:0, right:0, top:0, bottom:2} , fill:"#6ebab5"});
+var greenSTop = new Skin({stroke:"#777777",borders: { left:0, right:0, top:2, bottom:0} , fill:"#6ebab5"});
 var greenBorderS = new Skin({borders: { left:1, right:1, top:1, bottom:1 }, fill: "white", stroke: '#6ebab5', left: 5, right: 5, top: 5, bottom: 5});
 var greyS = new Skin({fill:"gray"});
 var buttonPressedS = new Skin({fill:"7d9694"});
@@ -349,7 +351,7 @@ var noStepsErrorMessage = new Label({top:10, string:"**Please add a step to your
 var noNameErrorMessage = new Label({top:10, string:"**Please name your schedule before saving.", style:errorStyle});
 var hasDoneError = false;
 var doneButtonTemplate = BUTTONS.Button.template(function($){ return{
-        height: 40,left:0,right:0,top:420, skin:greenS,
+        height: 40,left:0,right:0,top:420, skin:greenSTop,
         contents: [
                 new Label({string:"Done", name:"doneLabel", style: backStyle})
         ],
@@ -444,7 +446,7 @@ Handler.bind("/addSched", Behavior({
 var mainScroller = new scroller({contents:[subContainer]});
 var mainScrollerCon = new Container({contents:[mainScroller],top:0,left:0,right:0,bottom:40,clip:true});
 exports.mainContainer = new Container.template(function($) { return {top:0, left:0, right:0, bottom:0, skin:whiteSkin, 
-	contents:[	new doneButtonTemplate({}),	mainScrollerCon, new Container({height: 60, left:0, right:0, skin:greenS, top:0,
+	contents:[	new doneButtonTemplate({}),	mainScrollerCon, new Container({height: 60, left:0, right:0, skin:greenSBottom, top:0,
 			contents: [ new Label({ left:5, string: "❮ Back", active:true,editable:true,style: backStyle,
 				behavior: Object.create(BUTTONS.ButtonBehavior.prototype, {
 					onTap: { value:  function(button) {
